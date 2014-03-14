@@ -1,0 +1,88 @@
+<?php
+/**
+ * PDOCI
+ *
+ * PHP version 5.3
+ *
+ * @category Tests
+ * @package  PDOOCI
+ * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
+ * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
+ * @link     http://github.com/taq/pdoci
+ */
+require_once "../pdoci.php";
+
+/**
+ * Testing connection
+ *
+ * PHP version 5.3
+ *
+ * @category Connection
+ * @package  PDOOCI
+ * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
+ * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
+ * @link     http://github.com/taq/pdoci
+ */
+class ConnectionTest extends PHPUnit_Framework_TestCase
+{
+    protected static $con = null;
+
+    /**
+     * Set up a new object
+     *
+     * @return null
+     */
+    public function setUp() 
+    {
+        $user = getenv("PDOOCI_user");
+        $pwd  = getenv("PDOOCI_pwd");
+        $str  = getenv("PDOOCI_str");
+        self::$con = new PDOOCI\PDOOCI($str, $user, $pwd);
+    }
+
+    /**
+     * Test if it is a valid object
+     *
+     * @return null
+     */
+    public function testObject() 
+    {
+        $this->assertNotNull(self::$con);
+    }
+
+    /**
+     * Test if can connect
+     *
+     * @return null
+     */
+    public function testConnection()
+    {
+        $this->assertNotNull(self::$con->getConnection());
+    }
+
+    /**
+     * Test if can connect using persistent connections
+     *
+     * @return null
+     */
+    public function testPersistentConnection()
+    {
+        $user = getenv("PDOOCI_user");
+        $pwd  = getenv("PDOOCI_pwd");
+        $str  = getenv("PDOOCI_str");
+        $con  = new PDOOCI\PDOOCI($str, $user, $pwd, array(\PDO::ATTR_PERSISTENT => true));
+        $this->assertNotNull($con->getConnection());
+    }
+
+    /**
+     * Test if the connection is closed
+     *
+     * @return null
+     */
+    public function testClosed()
+    {
+        self::$con->close();
+        $this->assertNull(self::$con->getConnection());
+    }
+}
+?>
