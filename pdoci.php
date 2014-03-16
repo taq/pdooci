@@ -66,14 +66,19 @@ class PDOOCI
      * Execute a query
      *
      * @param string $statement sql query
+     * @param int    $mode      PDO query() mode
+     * @param int    $p1        PDO query() first parameter
+     * @param int    $p2        PDO query() second parameter
      *
      * @return PDOOCIStatement
      */
-    public function query($statement)
+    public function query($statement, $mode=null, $p1=null, $p2=null)
     {
+        // TODO: use mode and parameters
         try {
             $stmt = new PDOOCIStatement($this->_con, $statement);
-            return $stmt->execute();
+            $stmt->execute();
+            return $stmt;
         } catch (Exception $e) {
             throw new \PDOException($exception->getMessage());
         }

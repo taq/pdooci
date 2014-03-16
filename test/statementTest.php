@@ -89,6 +89,59 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test a fetch with PDO::FETCH_BOTH
+     *
+     * @return null
+     */
+    public function testFetchBoth()
+    {
+        $this->_insertValueWithExec();
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetch();
+        $stmt->closeCursor();
+        $this->assertTrue($this->_checkKeys(array(0,"NAME",1,"EMAIL"), array_keys($data)));
+        $this->assertEquals(4, sizeof($data));
+        $this->assertEquals("eustaquio", $data[0]);
+        $this->assertEquals("eustaquiorangel@gmail.com", $data[1]);
+        $this->assertEquals("eustaquio", $data["NAME"]);
+        $this->assertEquals("eustaquiorangel@gmail.com", $data["EMAIL"]);
+    }
+
+    /**
+     * Test a fetch with PDO::FETCH_ASSOC
+     *
+     * @return null
+     */
+    public function testFetchAssoc()
+    {
+        $this->_insertValueWithExec();
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertTrue($this->_checkKeys(array("NAME","EMAIL"), array_keys($data)));
+        $this->assertEquals(2, sizeof($data));
+        $this->assertEquals("eustaquio", $data["NAME"]);
+        $this->assertEquals("eustaquiorangel@gmail.com", $data["EMAIL"]);
+    }
+
+    /**
+     * Test a fetch with PDO::FETCH_NUM
+     *
+     * @return null
+     */
+    public function testFetchNum()
+    {
+        $this->_insertValueWithExec();
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetch(PDO::FETCH_NUM);
+        $stmt->closeCursor();
+        $this->assertTrue($this->_checkKeys(array(0,1), array_keys($data)));
+        $this->assertEquals(2, sizeof($data));
+        $this->assertEquals("eustaquio", $data[0]);
+        $this->assertEquals("eustaquiorangel@gmail.com", $data[1]);
+    }
+
+    /**
      * Insert a row
      *
      * @return PDOOCIStatement statement
@@ -126,5 +179,24 @@ class StatementTest extends PHPUnit_Framework_TestCase
     private function _deleteValueWithExec()
     {
         return self::$con->exec("delete from people where name='eustaquio'");
+    }
+
+    /**
+     * Check the array keys
+     *
+     * @param array $expected keys expected
+     * @param array $found    keys found
+     *
+     * @return all keys ok
+     */
+    private function _checkKeys($expected, $found)
+    {
+        $size = sizeof($expected);
+        for ($i=0; $i<$size; $i++) {
+            if ($expected[$i] != $found[$i]) {
+                return false;
+            }
+        }
+        return true;
     }
 }

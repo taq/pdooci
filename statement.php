@@ -85,6 +85,37 @@ class PDOOCIStatement implements \Iterator
     }
 
     /**
+     * Fetch a value
+     *
+     * @param int $style to fetch values
+     *
+     * @return mixed
+     */
+    public function fetch($style=null)
+    {
+        try {
+            $style = !$style ? \PDO::FETCH_BOTH : $style;
+            $rst   = null;
+
+            switch ($style) 
+            {
+            case \PDO::FETCH_BOTH:
+                $rst = oci_fetch_array($this->_stmt, \OCI_BOTH);
+                break;
+            case \PDO::FETCH_ASSOC:
+                $rst = oci_fetch_array($this->_stmt, \OCI_ASSOC);
+                break;
+            case \PDO::FETCH_NUM:
+                $rst = oci_fetch_array($this->_stmt, \OCI_NUM);
+                break;
+            }
+        } catch (Exception $e) {
+            throw new \PDOException($e->getMessage());
+        }
+        return $rst;
+    }
+
+    /**
      * Return the current value
      *
      * @return null
