@@ -75,6 +75,22 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test if throws an exception when failing to open connection
+     *
+     * @expectedException PDOException
+     *
+     * @return null
+     */
+    public function testInvalidConnection()
+    {
+        $user = "pdooci";
+        $pwd  = "pdooci";
+        $str  = "pdooci";
+        $con  = new PDOOCI\PDOOCI($str, $user, $pwd, array(\PDO::ATTR_PERSISTENT => true));
+        $this->assertNull($con->getConnection());
+    }
+
+    /**
      * Test if the connection is closed
      *
      * @return null

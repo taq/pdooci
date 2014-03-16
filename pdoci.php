@@ -39,10 +39,14 @@ class PDOOCI
      */
     public function __construct($data, $username, $password, $options=null)
     {
-        if (!is_null($options) && array_key_exists(\PDO::ATTR_PERSISTENT, $options)) {
-            $this->_con = \oci_pconnect($username, $password, $data);
-        } else {
-            $this->_con = \oci_connect($username, $password, $data);
+        try {
+            if (!is_null($options) && array_key_exists(\PDO::ATTR_PERSISTENT, $options)) {
+                $this->_con = \oci_pconnect($username, $password, $data);
+            } else {
+                $this->_con = \oci_connect($username, $password, $data);
+            }
+        } catch (\Exception $exception) {
+            throw new \PDOException($exception->getMessage());
         }
         return $this;
     }
