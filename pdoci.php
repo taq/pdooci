@@ -11,6 +11,7 @@
  * @link     http://github.com/taq/pdoci
  */
 namespace PDOOCI;
+require_once "statement.php";
 
 /**
  * Main class of PDOCI
@@ -59,6 +60,23 @@ class PDOOCI
     public function getConnection() 
     {
         return $this->_con;
+    }
+
+    /**
+     * Execute a query
+     *
+     * @param string $statement sql query
+     *
+     * @return PDOOCIStatement
+     */
+    public function query($statement)
+    {
+        try {
+            $stmt = new PDOOCIStatement($this->_con, $statement);
+            return $stmt->execute();
+        } catch (Exception $e) {
+            throw new \PDOException($exception->getMessage());
+        }
     }
 
     /**
