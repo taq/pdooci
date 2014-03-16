@@ -80,6 +80,26 @@ class PDOOCI
     }
 
     /**
+     * Execute query
+     *
+     * @param string $sql query
+     *
+     * @return number of affected rows
+     */
+    public function exec($sql)
+    {
+        try {
+            $stmt = $this->query($sql);
+            $rows = $stmt->rowCount();
+            $stmt->closeCursor();
+            return $rows;
+        } catch (Exception $e) {
+            throw new \PDOException($e->getMessage());
+        }
+        return $this;
+    }
+
+    /**
      * Close connection
      *
      * @return null

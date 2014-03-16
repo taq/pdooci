@@ -74,6 +74,17 @@ class PDOOCIStatement implements \Iterator
     }
 
     /**
+     * Close the current cursor
+     *
+     * @return null
+     */
+    public function closeCursor()
+    {
+        oci_free_statement($this->_stmt);
+        $this->_stmt = null;
+    }
+
+    /**
      * Return the current value
      *
      * @return null

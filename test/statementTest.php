@@ -66,6 +66,29 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test an INSERT with exec()
+     *
+     * @return null
+     */
+    public function testInsertWithExec()
+    {
+        $rows = $this->_insertValueWithExec();
+        $this->assertEquals(1, $rows);
+    }
+
+    /**
+     * Test a DELETE with exec()
+     *
+     * @return null
+     */
+    public function testDeleteWithExec()
+    {
+        $this->_insertValueWithExec();
+        $rows = $this->_deleteValueWithExec();
+        $this->assertEquals(1, $rows);
+    }
+
+    /**
      * Insert a row
      *
      * @return PDOOCIStatement statement
@@ -83,5 +106,25 @@ class StatementTest extends PHPUnit_Framework_TestCase
     private function _deleteValue()
     {
         return self::$con->query("delete from people where name='eustaquio'");
+    }
+
+    /**
+     * Insert a row with exec()
+     *
+     * @return PDOOCIStatement statement
+     */
+    private function _insertValueWithExec()
+    {
+        return self::$con->exec("insert into people (name,email) values ('eustaquio','eustaquiorangel@gmail.com')");
+    }
+
+    /**
+     * Delete a row with exec()
+     *
+     * @return PDOOCIStatement statement
+     */
+    private function _deleteValueWithExec()
+    {
+        return self::$con->exec("delete from people where name='eustaquio'");
     }
 }
