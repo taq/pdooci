@@ -116,7 +116,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
     {
         $this->_insertValueWithExec();
         $stmt = self::$con->query("select * from people");
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
         $stmt->closeCursor();
         $this->assertTrue($this->_checkKeys(array("NAME","EMAIL"), array_keys($data)));
         $this->assertEquals(2, sizeof($data));
@@ -133,12 +133,44 @@ class StatementTest extends PHPUnit_Framework_TestCase
     {
         $this->_insertValueWithExec();
         $stmt = self::$con->query("select * from people");
-        $data = $stmt->fetch(PDO::FETCH_NUM);
+        $data = $stmt->fetch(\PDO::FETCH_NUM);
         $stmt->closeCursor();
         $this->assertTrue($this->_checkKeys(array(0,1), array_keys($data)));
         $this->assertEquals(2, sizeof($data));
         $this->assertEquals("eustaquio", $data[0]);
         $this->assertEquals("eustaquiorangel@gmail.com", $data[1]);
+    }
+
+    /**
+     * Test autocommit off and rollback
+     *
+     * @return null
+     */
+    public function testAutocommitOff()
+    {
+        self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+        $this->_insertValueWithExec();
+        self::$con->rollBack();
+        $stmt = self::$con->query("select count(*) as count from people");
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals(0, intval($data["COUNT"]));
+    }
+
+    /**
+     * Test autocommit off and commit
+     *
+     * @return null
+     */
+    public function testAutocommitOn()
+    {
+        self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+        $this->_insertValueWithExec();
+        self::$con->commit();
+        $stmt = self::$con->query("select count(*) as count from people");
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals(1, intval($data["COUNT"]));
     }
 
     /**

@@ -25,6 +25,7 @@ namespace PDOOCI;
  */
 class PDOOCIStatement implements \Iterator
 {
+    private $_pdooci    = null;
     private $_con       = null;
     private $_statement = null;
     private $_stmt      = null;
@@ -37,12 +38,13 @@ class PDOOCIStatement implements \Iterator
      *
      * @return PDOOCI\Statement $statement created
      */
-    public function __construct($con, $statement)
+    public function __construct($pdooci, $statement)
     {
         try {
-            $this->_con       = $con;
+            $this->_pdooci    = $pdooci;
+            $this->_con       = $pdooci->getConnection();
             $this->_statement = $statement;
-            $this->_stmt      = oci_parse($con, $statement);
+            $this->_stmt      = oci_parse($this->_con, $statement);
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -56,7 +58,9 @@ class PDOOCIStatement implements \Iterator
     public function execute()
     {
         try {
-            oci_execute($this->_stmt);
+            $this->_pdooci->getAutoCommit();
+            $auto = $this->_pdooci->getAutoCommit() ? \OCI_COMMIT_ON_SUCCESS : \OCI_NO_AUTO_COMMIT;
+            oci_execute($this->_stmt, $auto);
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }

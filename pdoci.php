@@ -27,6 +27,7 @@ require_once "statement.php";
 class PDOOCI
 {
     private $_con = null;
+    private $_autocommit = true;
 
     /** 
      * Class constructor
@@ -76,7 +77,7 @@ class PDOOCI
     {
         // TODO: use mode and parameters
         try {
-            $stmt = new PDOOCIStatement($this->_con, $statement);
+            $stmt = new PDOOCIStatement($this, $statement);
             $stmt->execute();
             return $stmt;
         } catch (Exception $e) {
@@ -102,6 +103,54 @@ class PDOOCI
             throw new \PDOException($e->getMessage());
         }
         return $this;
+    }
+
+    /**
+     * Set an attribute
+     *
+     * @param int   $attr  attribute
+     * @param mixed $value value
+     *
+     * @return boolean if set was ok
+     */
+    public function setAttribute($attr, $value)
+    {
+        switch($attr)
+        {
+        case \PDO::ATTR_AUTOCOMMIT:
+            $this->_autocommit = $value || in_array(strtolower($value), array("on", "true"));
+            return;
+        }
+    }
+
+    /**
+     * Return the auto commit flag
+     *
+     * @return boolean auto commit flag
+     */
+    public function getAutoCommit()
+    {
+        return $this->_autocommit;
+    }
+
+    /**
+     * Commit connection
+     *
+     * @return boolean if commit was executed
+     */
+    public function commit()
+    {
+        oci_commit($this->_con);
+    }
+
+    /**
+     * Rollback connection
+     *
+     * @return boolean if rollback was executed
+     */
+    public function rollBack()
+    {
+        oci_rollback($this->_con);
     }
 
     /**
