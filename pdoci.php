@@ -40,9 +40,9 @@ class PDOOCI
     public function __construct($data, $username, $password, $options=null)
     {
         if (!is_null($options) && array_key_exists(\PDO::ATTR_PERSISTENT, $options)) {
-            $this->_con = oci_pconnect($username, $password, $data);
+            $this->_con = \oci_pconnect($username, $password, $data);
         } else {
-            $this->_con = oci_connect($username, $password, $data);
+            $this->_con = \oci_connect($username, $password, $data);
         }
         return $this;
     }
@@ -67,7 +67,7 @@ class PDOOCI
         if (is_null($this->_con)) {
             return;
         }
-        oci_close($this->_con);
+        \oci_close($this->_con);
         $this->_con = null;
     }
 }
