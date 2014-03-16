@@ -140,7 +140,7 @@ class PDOOCI
      */
     public function commit()
     {
-        oci_commit($this->_con);
+        \oci_commit($this->_con);
     }
 
     /**
@@ -150,7 +150,7 @@ class PDOOCI
      */
     public function rollBack()
     {
-        oci_rollback($this->_con);
+        \oci_rollback($this->_con);
     }
 
     /**

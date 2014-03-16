@@ -33,7 +33,7 @@ class PDOOCIStatement implements \Iterator
     /**
      * Constructor
      *
-     * @param resource $con       database connection
+     * @param resource $pdooci    PDOOCI connection
      * @param string   $statement sql statement
      *
      * @return PDOOCI\Statement $statement created
@@ -44,7 +44,7 @@ class PDOOCIStatement implements \Iterator
             $this->_pdooci    = $pdooci;
             $this->_con       = $pdooci->getConnection();
             $this->_statement = $statement;
-            $this->_stmt      = oci_parse($this->_con, $statement);
+            $this->_stmt      = \oci_parse($this->_con, $statement);
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -60,7 +60,7 @@ class PDOOCIStatement implements \Iterator
         try {
             $this->_pdooci->getAutoCommit();
             $auto = $this->_pdooci->getAutoCommit() ? \OCI_COMMIT_ON_SUCCESS : \OCI_NO_AUTO_COMMIT;
-            oci_execute($this->_stmt, $auto);
+            \oci_execute($this->_stmt, $auto);
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -74,7 +74,7 @@ class PDOOCIStatement implements \Iterator
      */
     public function rowCount()
     {
-        return oci_num_rows($this->_stmt);
+        return \oci_num_rows($this->_stmt);
     }
 
     /**
@@ -84,7 +84,7 @@ class PDOOCIStatement implements \Iterator
      */
     public function closeCursor()
     {
-        oci_free_statement($this->_stmt);
+        \oci_free_statement($this->_stmt);
         $this->_stmt = null;
     }
 
@@ -104,13 +104,13 @@ class PDOOCIStatement implements \Iterator
             switch ($style) 
             {
             case \PDO::FETCH_BOTH:
-                $rst = oci_fetch_array($this->_stmt, \OCI_BOTH);
+                $rst = \oci_fetch_array($this->_stmt, \OCI_BOTH);
                 break;
             case \PDO::FETCH_ASSOC:
-                $rst = oci_fetch_array($this->_stmt, \OCI_ASSOC);
+                $rst = \oci_fetch_array($this->_stmt, \OCI_ASSOC);
                 break;
             case \PDO::FETCH_NUM:
-                $rst = oci_fetch_array($this->_stmt, \OCI_NUM);
+                $rst = \oci_fetch_array($this->_stmt, \OCI_NUM);
                 break;
             }
         } catch (Exception $e) {
