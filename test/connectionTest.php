@@ -159,5 +159,29 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("'Nice'", self::$con->quote('Nice'));
         $this->assertEquals("'Naughty '' string'", self::$con->quote('Naughty \' string'));
     }
+
+    /**
+     * Test if fails if requiring the last inserted id without a sequence
+     *
+     * @expectedException PDOException
+     * @expectedExceptionMessage SQLSTATE[IM001]: Driver does not support this function: driver does not support getting attributes in system_requirements
+     *
+     * @return null
+     */
+    public function testLastIdWithoutSequence()
+    {
+        $id = self::$con->lastInsertId();
+    }
+
+    /**
+     * Test if returns the last inserted id with a sequence
+     *
+     * @return null
+     */
+    public function testLastIdWithSequence()
+    {
+        $id = self::$con->lastInsertId("people_sequence");
+        $this->assertTrue(is_numeric($id));
+    }
 }
 ?>

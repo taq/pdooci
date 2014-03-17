@@ -332,5 +332,28 @@ class PDO
         $string = "'$string'";
         return $string;
     }
+
+    /**
+     * Return the last inserted id
+     * If the sequence name is not sent, throws an exception
+     *
+     * @param string $sequence name
+     *
+     * @return mixed last id
+     */
+    public function lastInsertId($sequence=null)
+    {
+        if (!$sequence) {
+            throw new \PDOException("SQLSTATE[IM001]: Driver does not support this function: driver does not support getting attributes in system_requirements");
+        }
+        $id = 0;
+        try {
+            $stmt = $this->query("select $sequence.currval from dual");
+            $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $id   = intval($data["CURRVAL"]);
+        } catch (\PDOException $e) {
+        }
+        return $id;
+    }
 }
 ?>
