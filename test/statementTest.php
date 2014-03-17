@@ -339,6 +339,23 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Bind column
+     *
+     * @return null
+     */
+    public function testBindColumn()
+    {
+        $this->_insertValue();
+        $stmt = self::$con->prepare("select * from people");
+        $stmt->execute();
+        $stmt->bindColumn(1, $name);
+        $stmt->bindColumn("email", $email);
+        $row = $stmt->fetch(\PDO::FETCH_BOUND);
+        $this->assertEquals("eustaquio", $name);
+        $this->assertEquals("eustaquiorangel@gmail.com", $email);
+    }
+
+    /**
      * Insert a row
      *
      * @return PDOOCIStatement statement

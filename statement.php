@@ -32,6 +32,7 @@ class PDOOCIStatement implements \Iterator
     private $_fetch_sty = null;
     private $_current   = null;
     private $_pos       = 0;
+    private $_binds     = array();
     public  $queryString= "";
 
     /**
@@ -144,11 +145,13 @@ class PDOOCIStatement implements \Iterator
         set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
             $style = !$style ? $this->_fetch_sty : $style;
+            $this->_fetch_sty = $style;
             $rst   = null;
 
             switch ($style) 
             {
             case \PDO::FETCH_BOTH:
+            case \PDO::FETCH_BOUND:
                 $rst = \oci_fetch_array($this->_stmt, \OCI_BOTH);
                 break;
             case \PDO::FETCH_ASSOC:
@@ -159,6 +162,7 @@ class PDOOCIStatement implements \Iterator
                 break;
             }
             $this->_current = $rst;
+            $this->_checkBinds();
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         } finally {
@@ -233,6 +237,7 @@ class PDOOCIStatement implements \Iterator
         if (!$this->_current) {
             $this->_pos = -1;
         }
+        $this->_checkBinds();
     }
 
     /**
@@ -259,11 +264,13 @@ class PDOOCIStatement implements \Iterator
     /**
      * Set the fetch mode
      *
-     * @param int $mode fetch mode
-     * 
+     * @param int   $mode fetch mode
+     * @param mixed $p1   first optional parameter
+     * @param mixed $p2   second optional parameter
+     *
      * @return null
      */
-    public function setFetchMode($mode)
+    public function setFetchMode($mode, $p1=null, $p2=null)
     {
         $this->_fetch_sty = $mode;
     }
@@ -276,6 +283,46 @@ class PDOOCIStatement implements \Iterator
     public function getFetchMode()
     {
         return $this->_fetch_sty;
+    }
+
+    /**
+     * Bind column
+     *
+     * @param mixed $column as index (1-based) or name
+     * @param mixed &$param variable
+     * @param int   $type   type
+     * @param int   $maxlen max length
+     * @param mixed $driver data
+     *
+     * @return bool if was bound
+     */
+    public function bindColumn($column, &$param, $type=null, $maxlen=null, $driver=null)
+    {
+        $column = is_numeric($column) ? $column : strtoupper($column);
+        $this->_binds[$column] = &$param;
+    }
+
+    /**
+     * Check what binds are needed
+     *
+     * @return null
+     */
+    private function _checkBinds()
+    {
+        if ($this->_fetch_sty!=\PDO::FETCH_BOUND) {
+            return;
+        }
+        foreach ($this->_binds as $key => &$value) {
+            if (is_numeric($key)) {
+                $key --;
+            } else {
+                $key = strtoupper($key);
+            }
+            if (!array_key_exists($key, $this->_current)) {
+                continue;
+            }
+            $value = $this->_current[$key];
+        }
     }
 }
 ?>
