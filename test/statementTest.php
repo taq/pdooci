@@ -356,6 +356,44 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Bind named value
+     *
+     * @return null
+     */
+    public function testBindNamedValue()
+    {
+        $nome = "eustaquio";
+        $this->_insertValue();
+        $stmt = self::$con->prepare("select * from people where name=:name");
+        $stmt->bindValue(":name", $nome, \PDO::PARAM_STR);
+        $stmt->execute();
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals($nome, $data["NAME"]);
+    }
+
+    /**
+     * Bind numeric value
+     *
+     * @return null
+     */
+    public function testBindNumericValue()
+    {
+        $nome = "eustaquio";
+        $this->_insertValue();
+        $stmt = self::$con->prepare("select * from people where name=?");
+        $stmt->bindValue(1, $nome, \PDO::PARAM_STR);
+        $stmt->execute();
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals($nome, $data["NAME"]);
+    }
+
+    /****************************************************************************
+     *  Helper functions                                                        *
+     ***************************************************************************/
+
+    /**
      * Insert a row
      *
      * @return PDOOCIStatement statement

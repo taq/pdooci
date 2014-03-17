@@ -59,6 +59,42 @@ class PDOOCIStatement implements \Iterator
     }
 
     /**
+     * Binds a value
+     *
+     * @param mixed $param param (column)
+     * @param mixed $value value for param
+     * @param mixed $type  optional data type
+     *
+     * @return bool bound
+     */
+    public function bindValue($param, $value, $type=null)
+    {
+        $ok = false;
+        try {
+            $param = $this->_getBindVar($param);
+            $ok    = \oci_bind_by_name($this->_stmt, $param, $value); //, -1, $type);
+        } catch (Exception $e) {
+            throw new \PDOException($e->getMessage());
+        }
+        return $ok;
+    }
+
+    /**
+     * Get the variable name for binding
+     *
+     * @param mixed $val variable value
+     *
+     * @return string corrent name for binding
+     */
+    private function _getBindVar($val)
+    {
+        if (preg_match('/^\d+$/', $val)) {
+            $val = ":pdooci_m".(intval($val)-1);
+        }
+        return $val;
+    }
+
+    /**
      * Execute statement
      *
      * @param mixed $values optional values
@@ -73,20 +109,21 @@ class PDOOCIStatement implements \Iterator
             $this->_pdooci->getAutoCommit();
             $auto = $this->_pdooci->getAutoCommit() ? \OCI_COMMIT_ON_SUCCESS : \OCI_NO_AUTO_COMMIT;
 
-            if ($values) {
+            if ($values && sizeof($values)>0) {
                 foreach ($values as $key => $val) {
                     $parm = $key;
                     if (preg_match('/^\d+$/', $key)) {
-                        $parm = ":pdooci_m$key";
+                        $parm ++;
                     }
-                    \oci_bind_by_name($this->_stmt, $parm, $values[$key]);
+                    $this->bindValue($parm, $values[$key]);
                     $this->_pdooci->setError();
                 }
             }
             $ok = \oci_execute($this->_stmt, $auto);
             if (!$ok) {
                 $this->_pdooci->setError($this->_stmt);
-                throw new \PDOException($this->_pdooci->errorInfo[2]);
+                $error = $this->_pdooci->errorInfo();
+                throw new \PDOException($error[2]);
             }
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
