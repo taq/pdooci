@@ -32,6 +32,7 @@ class PDOOCIStatement implements \Iterator
     private $_fetch_sty = null;
     private $_current   = null;
     private $_pos       = 0;
+    public  $queryString= "";
 
     /**
      * Constructor
@@ -48,6 +49,8 @@ class PDOOCIStatement implements \Iterator
             $this->_con       = $pdooci->getConnection();
             $this->_statement = PDOOCIStatement::insertMarks($statement);
             $this->_stmt      = \oci_parse($this->_con, $this->_statement);
+
+            $this->queryString = $this->_statement;
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
