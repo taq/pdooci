@@ -41,6 +41,10 @@ class PDO
      */
     public function __construct($data, $username, $password, $options=null)
     {
+        if (!function_exists("\oci_parse")) {
+            throw new \PDOException("No support for Oracle, please install the OCI driver");
+        }
+
         try {
             if (!is_null($options) && array_key_exists(\PDO::ATTR_PERSISTENT, $options)) {
                 $this->_con = \oci_pconnect($username, $password, $data);
