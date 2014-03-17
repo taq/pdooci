@@ -24,7 +24,7 @@ require_once "statement.php";
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdoci
  */
-class PDOOCI
+class PDO
 {
     private $_con = null;
     private $_autocommit = true;
@@ -37,7 +37,7 @@ class PDOOCI
      * @param string $password password
      * @param string $options  options to send to the connection
      *
-     * @return PDOOCI object
+     * @return PDO object
      */
     public function __construct($data, $username, $password, $options=null)
     {

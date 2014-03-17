@@ -37,7 +37,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         $user = getenv("PDOOCI_user");
         $pwd  = getenv("PDOOCI_pwd");
         $str  = getenv("PDOOCI_str");
-        self::$con = new PDOOCI\PDOOCI($str, $user, $pwd);
+        self::$con = new PDOOCI\PDO($str, $user, $pwd);
     }
 
     /**
@@ -70,7 +70,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         $user = getenv("PDOOCI_user");
         $pwd  = getenv("PDOOCI_pwd");
         $str  = getenv("PDOOCI_str");
-        $con  = new PDOOCI\PDOOCI($str, $user, $pwd, array(\PDO::ATTR_PERSISTENT => true));
+        $con  = new PDOOCI\PDO($str, $user, $pwd, array(\PDO::ATTR_PERSISTENT => true));
         $this->assertNotNull($con->getConnection());
     }
 
@@ -86,7 +86,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         $user = "pdooci";
         $pwd  = "pdooci";
         $str  = "pdooci";
-        $con  = new PDOOCI\PDOOCI($str, $user, $pwd, array(\PDO::ATTR_PERSISTENT => true));
+        $con  = new PDOOCI\PDO($str, $user, $pwd, array(\PDO::ATTR_PERSISTENT => true));
         $this->assertNull($con->getConnection());
     }
 

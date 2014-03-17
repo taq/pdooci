@@ -38,7 +38,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $user = getenv("PDOOCI_user");
         $pwd  = getenv("PDOOCI_pwd");
         $str  = getenv("PDOOCI_str");
-        self::$con = new PDOOCI\PDOOCI($str, $user, $pwd);
+        self::$con = new PDOOCI\PDO($str, $user, $pwd);
         self::$con->query("delete from people");
     }
 
