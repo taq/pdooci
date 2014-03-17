@@ -326,6 +326,19 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Fetch mode
+     *
+     * @return null
+     */
+    public function testFetchMode()
+    {
+        $stmt = self::$con->prepare("select * from people");
+        $stmt->setFetchMode(\PDO::FETCH_ASSOC);
+        $this->assertEquals(\PDO::FETCH_ASSOC, $stmt->getFetchMode());
+        $stmt->closeCursor();
+    }
+
+    /**
      * Insert a row
      *
      * @return PDOOCIStatement statement

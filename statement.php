@@ -49,6 +49,7 @@ class PDOOCIStatement implements \Iterator
             $this->_con       = $pdooci->getConnection();
             $this->_statement = PDOOCIStatement::insertMarks($statement);
             $this->_stmt      = \oci_parse($this->_con, $this->_statement);
+            $this->_fetch_sty = \PDO::FETCH_BOTH;
 
             $this->queryString = $this->_statement;
         } catch (Exception $e) {
@@ -142,8 +143,7 @@ class PDOOCIStatement implements \Iterator
     {
         set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
-            $style = !$style ? \PDO::FETCH_BOTH : $style;
-            $this->_fetch_sty = $style;
+            $style = !$style ? $this->_fetch_sty : $style;
             $rst   = null;
 
             switch ($style) 
@@ -254,6 +254,28 @@ class PDOOCIStatement implements \Iterator
     {
         $valid = $this->_pos >= 0;
         return $valid;
+    }
+
+    /**
+     * Set the fetch mode
+     *
+     * @param int $mode fetch mode
+     * 
+     * @return null
+     */
+    public function setFetchMode($mode)
+    {
+        $this->_fetch_sty = $mode;
+    }
+
+    /**
+     * Return the fetch mode
+     *
+     * @return int mode
+     */
+    public function getFetchMode()
+    {
+        return $this->_fetch_sty;
     }
 }
 ?>
