@@ -43,8 +43,8 @@ class PDOOCIStatement implements \Iterator
         try {
             $this->_pdooci    = $pdooci;
             $this->_con       = $pdooci->getConnection();
-            $this->_statement = $statement;
-            $this->_stmt      = \oci_parse($this->_con, $statement);
+            $this->_statement = PDOOCIStatement::insertMarks($statement);
+            $this->_stmt      = \oci_parse($this->_con, $this->_statement);
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -53,18 +53,31 @@ class PDOOCIStatement implements \Iterator
     /**
      * Execute statement
      *
+     * @param mixed $values optional values
+     *
      * @return this object
      */
-    public function execute()
+    public function execute($values=null)
     {
+        $ok = false;
         try {
             $this->_pdooci->getAutoCommit();
             $auto = $this->_pdooci->getAutoCommit() ? \OCI_COMMIT_ON_SUCCESS : \OCI_NO_AUTO_COMMIT;
-            \oci_execute($this->_stmt, $auto);
+
+            if ($values) {
+                foreach ($values as $key => $val) {
+                    $parm = $key;
+                    if (preg_match('/^\d+$/', $key)) {
+                        $parm = ":pdooci_m$key";
+                    }
+                    \oci_bind_by_name($this->_stmt, $parm, $values[$key]);
+                }
+            }
+            $ok = \oci_execute($this->_stmt, $auto);
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
-        return $this;
+        return $ok;
     }
 
     /**
@@ -117,6 +130,35 @@ class PDOOCIStatement implements \Iterator
             throw new \PDOException($e->getMessage());
         }
         return $rst;
+    }
+
+    /**
+     * Convert a query to use bind marks
+     *
+     * @param string $query to insert bind marks
+     *
+     * @return query with bind marks
+     */
+    public static function insertMarks($query)
+    {
+        preg_match_all('/\?/', $query, $marks);
+        if (sizeof($marks[0])<1) {
+            return $query;
+        }
+        foreach ($marks[0] as $idx => $mark) {
+            $query = preg_replace("/\?/", ":pdooci_m$idx", $query, 1);
+        }
+        return $query;
+    }
+
+    /**
+     * Return the current statement
+     *
+     * @return string statement
+     */
+    public function getStatement()
+    {
+        return $this->_statement;
     }
 
     /**

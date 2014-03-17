@@ -174,6 +174,122 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Convert a query to use bind marks
+     *
+     * @return String query
+     */
+    public function testCreateMarks()
+    {
+        $sql = "insert into people (name,email) values (?,?)";
+        $converted = "insert into people (name,email) values (:pdooci_m0,:pdooci_m1)";
+        $this->assertEquals($converted, PDOOCI\PDOOCIStatement::insertMarks($sql));
+    }
+
+    /**
+     * Don't change the query if is not needed
+     *
+     * @return String query
+     */
+    public function testDontCreateMarks()
+    {
+        $sql = "insert into people (name,email) values (:name,:email)";
+        $this->assertEquals($sql, PDOOCI\PDOOCIStatement::insertMarks($sql));
+    }
+
+    /**
+     * Prepare a statement without values
+     *
+     * @return PDOOCIStatement statement
+     */
+    public function testPreparedWithoutValues()
+    {
+        $sql  = "insert into people (name,email) values ('eustaquio','eustaquiorangel@gmail.com')";
+        $stmt = self::$con->prepare($sql);
+        $this->assertNotNull($stmt);
+        $this->assertEquals($sql, $stmt->getStatement());
+        $this->assertTrue($stmt->execute());
+        $rows = $stmt->rowCount();
+        $stmt->closeCursor();
+        $this->assertEquals(1, $rows);
+
+        $data = $this->_getValues();
+        $this->assertEquals("eustaquio", $data["NAME"]);
+        $this->assertEquals("eustaquiorangel@gmail.com", $data["EMAIL"]);
+    }
+
+    /**
+     * Prepare a statement with numeric index based values
+     *
+     * @return PDOOCIStatement statement
+     */
+    public function testPreparedWithNumericIndexes()
+    {
+        $user = "u".mktime();
+        $email= "$user@gmail.com";
+        $sql  = "insert into people (name,email) values (?,?)";
+        $exp  = "insert into people (name,email) values (:pdooci_m0,:pdooci_m1)";
+        $stmt = self::$con->prepare($sql);
+        $this->assertNotNull($stmt);
+        $this->assertEquals($exp, $stmt->getStatement());
+        $this->assertTrue($stmt->execute(array($user,$email)));
+        $rows = $stmt->rowCount();
+        $stmt->closeCursor();
+        $this->assertEquals(1, $rows);
+
+        $data = $this->_getValues();
+        $this->assertEquals($user,  $data["NAME"]);
+        $this->assertEquals($email, $data["EMAIL"]);
+    }
+
+    /**
+     * Prepare a statement with named based values
+     *
+     * @return PDOOCIStatement statement
+     */
+    public function testPreparedWithNamedIndexes()
+    {
+        $user = "u".mktime();
+        $email= "$user@gmail.com";
+        $sql  = "insert into people (name,email) values (:name,:email)";
+        $stmt = self::$con->prepare($sql);
+        $this->assertEquals($sql, $stmt->getStatement());
+        $this->assertNotNull($stmt);
+        $this->assertTrue($stmt->execute(array(":name"=>$user,":email"=>$email)));
+        $rows = $stmt->rowCount();
+        $stmt->closeCursor();
+        $this->assertEquals(1, $rows);
+
+        $data = $this->_getValues();
+        $this->assertEquals($user,  $data["NAME"]);
+        $this->assertEquals($email, $data["EMAIL"]);
+    }
+
+    /**
+     * Prepare a crazy statement with indexes and named based values
+     * What stupid crazy maniac will make something like that?
+     *
+     * @return PDOOCIStatement statement
+     */
+    public function testPreparedWithCrazyIndexes()
+    {
+        $user = "u".mktime();
+        $email= "$user@gmail.com";
+        $sql  = "insert into people (name,email) values (?,:email)";
+        $exp  = "insert into people (name,email) values (:pdooci_m0,:email)";
+        $stmt = self::$con->prepare($sql);
+        $this->assertEquals($exp, $stmt->getStatement());
+        $this->assertNotNull($stmt);
+        $this->assertTrue($stmt->execute(array(0=>$user,":email"=>$email)));
+        $rows = $stmt->rowCount();
+        $stmt->closeCursor();
+        $this->assertEquals(1, $rows);
+
+        $data = $this->_getValues();
+        $this->assertEquals($user,  $data["NAME"]);
+        $this->assertEquals($email, $data["EMAIL"]);
+    }
+
+    /**
      * Insert a row
      *
      * @return PDOOCIStatement statement
@@ -230,5 +346,17 @@ class StatementTest extends PHPUnit_Framework_TestCase
             }
         }
         return true;
+    }
+
+    /**
+     * Get values from table
+     *
+     * @return array values
+     */
+    private function _getValues()
+    {
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $data;
     }
 }

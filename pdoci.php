@@ -154,6 +154,25 @@ class PDO
     }
 
     /**
+     * Prepare a statement
+     *
+     * @param string $query   for statement
+     * @param mixed  $options for driver
+     *
+     * @return PDOOCIStatement
+     */
+    public function prepare($query, $options=null)
+    {
+        $stmt = null;
+        try {
+            $stmt  = new PDOOCIStatement($this, $query);
+        } catch (Exception $e) {
+            throw new \PDOException($e->getMessage());
+        }
+        return $stmt;
+    }
+
+    /**
      * Close connection
      *
      * @return null
