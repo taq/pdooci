@@ -118,9 +118,26 @@ class PDO
         switch($attr)
         {
         case \PDO::ATTR_AUTOCOMMIT:
-            $this->_autocommit = $value || in_array(strtolower($value), array("on", "true"));
+            $this->_autocommit = (is_bool($value) && $value) || in_array(strtolower($value), array("on", "true"));
             return;
         }
+    }
+
+    /**
+     * Return an attribute
+     *
+     * @param int $attr attribute
+     *
+     * @return mixed attribute value
+     */
+    public function getAttribute($attr)
+    {
+        switch($attr)
+        {
+        case \PDO::ATTR_AUTOCOMMIT:
+            return $this->_autocommit;
+        }
+        return null;
     }
 
     /**

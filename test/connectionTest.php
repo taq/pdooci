@@ -100,5 +100,16 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         self::$con->close();
         $this->assertNull(self::$con->getConnection());
     }
+
+    /**
+     * Set and get an attribute
+     *
+     * @return null
+     */
+    public function testAttributes()
+    {
+        self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, true);
+        $this->assertTrue(self::$con->getAttribute(\PDO::ATTR_AUTOCOMMIT));
+    }
 }
 ?>
