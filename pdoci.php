@@ -317,5 +317,20 @@ class PDO
     {
         return !$this->_autocommit;
     }
+
+    /**
+     * Quote a string
+     *
+     * @param string $string to be quoted
+     * @param int    $type   parameter type
+     *
+     * @return string quoted
+     */
+    public function quote($string, $type=null)
+    {
+        $string = preg_replace('/\'/', "''", $string);
+        $string = "'$string'";
+        return $string;
+    }
 }
 ?>

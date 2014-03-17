@@ -148,5 +148,16 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, true);
         $this->assertFalse(self::$con->inTransaction());
     }
+
+    /**
+     * Test quotes
+     *
+     * @return null
+     */
+    public function testQuote()
+    {
+        $this->assertEquals("'Nice'", self::$con->quote('Nice'));
+        $this->assertEquals("'Naughty '' string'", self::$con->quote('Naughty \' string'));
+    }
 }
 ?>
