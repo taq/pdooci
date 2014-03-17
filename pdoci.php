@@ -28,6 +28,7 @@ class PDO
 {
     private $_con = null;
     private $_autocommit = true;
+    private $_last_error = null;
 
     /** 
      * Class constructor
@@ -48,12 +49,14 @@ class PDO
         try {
             if (!is_null($options) && array_key_exists(\PDO::ATTR_PERSISTENT, $options)) {
                 $this->_con = \oci_pconnect($username, $password, $data);
+                $this->setError();
             } else {
                 $this->_con = \oci_connect($username, $password, $data);
+                $this->setError();
             }
         } catch (\Exception $exception) {
             throw new \PDOException($exception->getMessage());
-        }
+        } 
         return $this;
     }
 
@@ -80,13 +83,16 @@ class PDO
     public function query($statement, $mode=null, $p1=null, $p2=null)
     {
         // TODO: use mode and parameters
+        $stmt = null;
         try {
             $stmt = new PDOOCIStatement($this, $statement);
             $stmt->execute();
+            $this->setError();
             return $stmt;
         } catch (Exception $e) {
             throw new \PDOException($exception->getMessage());
         }
+        return $stmt;
     }
 
     /**
@@ -162,6 +168,7 @@ class PDO
     public function commit()
     {
         \oci_commit($this->_con);
+        $this->setError();
     }
 
     /**
@@ -172,6 +179,7 @@ class PDO
     public function rollBack()
     {
         \oci_rollback($this->_con);
+        $this->setError();
     }
 
     /**
@@ -196,11 +204,59 @@ class PDO
     {
         $stmt = null;
         try {
-            $stmt  = new PDOOCIStatement($this, $query);
+            $stmt = new PDOOCIStatement($this, $query);
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         return $stmt;
+    }
+
+    /**
+     * Sets the last error found
+     *
+     * @param mixed $obj optional object to extract error from
+     *
+     * @return null
+     */
+    public function setError($obj=null)
+    {
+        $obj = $obj ? $obj : $this->_con;
+        if (!is_resource($obj)) {
+            return;
+        }
+        $error = \oci_error($obj);
+        if (!$error) {
+            return null;
+        }
+        $this->_last_error = $error;
+    }
+
+    /**
+     * Returns the last error found
+     *
+     * @return int error code
+     */
+    public function errorCode()
+    {
+        if (!$this->_last_error) {
+            return null;
+        }
+        return intval($this->_last_error["code"]);
+    }
+
+    /**
+     * Returns the last error info
+     *
+     * @return array error info
+     */
+    public function errorInfo()
+    {
+        if (!$this->_last_error) {
+            return null;
+        }
+        return array($this->_last_error["code"],
+                     $this->_last_error["code"],
+                     $this->_last_error["message"]);
     }
 
     /**
@@ -215,6 +271,26 @@ class PDO
         }
         \oci_close($this->_con);
         $this->_con = null;
+    }
+
+    /**
+     * Trigger stupid errors who should be exceptions
+     *
+     * @param int    $errno   error number
+     * @param string $errstr  error message
+     * @param mixed  $errfile error file
+     * @param int    $errline error line
+     *
+     * @return null
+     */
+    function errorHandler($errno, $errstr, $errfile, $errline)
+    {
+        preg_match('/(ORA-)(\d+)/', $errstr, $ora_error);
+        if ($ora_error) {
+            $this->_last_error = intval($ora_error[2]);
+        } else {
+            $this->setError($this->_con);
+        }
     }
 }
 ?>

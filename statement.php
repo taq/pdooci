@@ -63,6 +63,7 @@ class PDOOCIStatement implements \Iterator
     public function execute($values=null)
     {
         $ok = false;
+        set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
             $this->_pdooci->getAutoCommit();
             $auto = $this->_pdooci->getAutoCommit() ? \OCI_COMMIT_ON_SUCCESS : \OCI_NO_AUTO_COMMIT;
@@ -74,11 +75,18 @@ class PDOOCIStatement implements \Iterator
                         $parm = ":pdooci_m$key";
                     }
                     \oci_bind_by_name($this->_stmt, $parm, $values[$key]);
+                    $this->_pdooci->setError();
                 }
             }
             $ok = \oci_execute($this->_stmt, $auto);
+            if (!$ok) {
+                $this->_pdooci->setError($this->_stmt);
+                throw new \PDOException($this->_pdooci->errorInfo[2]);
+            }
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
+        } finally {
+            restore_error_handler();
         }
         return $ok;
     }
@@ -90,7 +98,16 @@ class PDOOCIStatement implements \Iterator
      */
     public function rowCount()
     {
-        return \oci_num_rows($this->_stmt);
+        set_error_handler(array($this->_pdooci,"errorHandler"));
+        $rows = null;
+        try {
+            $rows = \oci_num_rows($this->_stmt);
+        } catch (Exception $e) {
+            throw new \PDOException($e->getMessage());
+        } finally {
+            restore_error_handler();
+        }
+        return $rows;
     }
 
     /**
@@ -100,7 +117,14 @@ class PDOOCIStatement implements \Iterator
      */
     public function closeCursor()
     {
-        \oci_free_statement($this->_stmt);
+        set_error_handler(array($this->_pdooci,"errorHandler"));
+        try {
+            \oci_free_statement($this->_stmt);
+        } catch (Exception $e) {
+            throw new \PDOException($e->getMessage());
+        } finally {
+            restore_error_handler();
+        }
         $this->_stmt = null;
     }
 
@@ -113,6 +137,7 @@ class PDOOCIStatement implements \Iterator
      */
     public function fetch($style=null)
     {
+        set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
             $style = !$style ? \PDO::FETCH_BOTH : $style;
             $this->_fetch_sty = $style;
@@ -133,6 +158,8 @@ class PDOOCIStatement implements \Iterator
             $this->_current = $rst;
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
+        } finally {
+            restore_error_handler();
         }
         return $rst;
     }

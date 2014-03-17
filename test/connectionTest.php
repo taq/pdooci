@@ -111,5 +111,19 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, true);
         $this->assertTrue(self::$con->getAttribute(\PDO::ATTR_AUTOCOMMIT));
     }
+
+    /**
+     * Test the error code
+     *
+     * @return null
+     */
+    public function testErrorCode()
+    {
+        try {
+            self::$con->exec("insert into bones (skull) values ('lucy')");
+        } catch(PDOException $e) {
+            $this->assertEquals(942, self::$con->errorCode());
+        }
+    }
 }
 ?>
