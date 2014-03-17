@@ -171,6 +171,16 @@ class PDO
     }
 
     /**
+     * Start a transaction, setting auto commit to off
+     *
+     * @return null
+     */
+    public function beginTransaction()
+    {
+        $this->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+    }
+
+    /**
      * Prepare a statement
      *
      * @param string $query   for statement

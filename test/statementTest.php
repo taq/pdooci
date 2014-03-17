@@ -151,10 +151,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
         $this->_insertValueWithExec();
         self::$con->rollBack();
-        $stmt = self::$con->query("select count(*) as count from people");
-        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
-        $this->assertEquals(0, intval($data["COUNT"]));
+        $this->assertEquals(0, $this->_getRowCount());
     }
 
     /**
@@ -167,10 +164,33 @@ class StatementTest extends PHPUnit_Framework_TestCase
         self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
         $this->_insertValueWithExec();
         self::$con->commit();
-        $stmt = self::$con->query("select count(*) as count from people");
-        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
-        $this->assertEquals(1, intval($data["COUNT"]));
+        $this->assertEquals(1, $this->_getRowCount());
+    }
+
+    /**
+     * Test beginTransaction and rollback
+     *
+     * @return null
+     */
+    public function testBeginTransactionAndRollback()
+    {
+        self::$con->beginTransaction();
+        $this->_insertValueWithExec();
+        self::$con->rollBack();
+        $this->assertEquals(0, $this->_getRowCount());
+    }
+
+    /**
+     * Test beginTransaction and commit
+     *
+     * @return null
+     */
+    public function testBeginTransactionAndCommit()
+    {
+        self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+        $this->_insertValueWithExec();
+        self::$con->commit();
+        $this->assertEquals(1, $this->_getRowCount());
     }
 
     /**
@@ -374,5 +394,18 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $stmt = self::$con->query("select * from people");
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $data;
+    }
+
+    /**
+     * Get the number of rows on the table
+     *
+     * @return int number of rows
+     */
+    private function _getRowCount()
+    {
+        $stmt = self::$con->query("select count(*) as count from people");
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        return intval($data["COUNT"]);
     }
 }

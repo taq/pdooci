@@ -85,7 +85,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
     {
         $user = "pdooci";
         $pwd  = "pdooci";
-        $str  = "pdooci";
+        $str  = "yaddayaddayadda";
         $con  = new PDOOCI\PDO($str, $user, $pwd, array(\PDO::ATTR_PERSISTENT => true));
         $this->assertNull($con->getConnection());
     }
