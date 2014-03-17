@@ -29,6 +29,7 @@ class PDOOCIStatement implements \Iterator
     private $_con       = null;
     private $_statement = null;
     private $_stmt      = null;
+    private $_fetch_sty = null;
 
     /**
      * Constructor
@@ -112,6 +113,7 @@ class PDOOCIStatement implements \Iterator
     {
         try {
             $style = !$style ? \PDO::FETCH_BOTH : $style;
+            $this->_fetch_sty = $style;
             $rst   = null;
 
             switch ($style) 
