@@ -307,5 +307,15 @@ class PDO
         }
         return $drivers;
     }
+
+    /**
+     * Return if is on a transaction
+     *
+     * @return boolean on a transaction
+     */
+    public function inTransaction()
+    {
+        return !$this->_autocommit;
+    }
 }
 ?>

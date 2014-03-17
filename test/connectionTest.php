@@ -135,5 +135,18 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
     {
         $this->assertTrue(in_array("oci", self::$con->getAvailableDrivers()));
     }
+
+    /**
+     * Test if is on a transaction
+     *
+     * @return null
+     */
+    public function testInTransaction()
+    {
+        self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+        $this->assertTrue(self::$con->inTransaction());
+        self::$con->setAttribute(\PDO::ATTR_AUTOCOMMIT, true);
+        $this->assertFalse(self::$con->inTransaction());
+    }
 }
 ?>
