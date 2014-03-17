@@ -382,5 +382,23 @@ class PDOOCIStatement implements \Iterator
             $value = $this->_current[$key];
         }
     }
+
+    /**
+     * Column count
+     *
+     * @return int column count or zero if not executed
+     */
+    public function columnCount()
+    {
+        if (!$this->_stmt) {
+            return 0;
+        }
+        try {
+            return \oci_num_fields($this->_stmt);
+        } catch (Exception $e) {
+            throw new \PDOException($e->getMessage());
+        }
+        return 0;
+    }
 }
 ?>

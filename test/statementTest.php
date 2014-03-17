@@ -427,6 +427,20 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($name, $data["NAME"]);
     }
 
+    /**
+     * Column count
+     *
+     * @return null
+     */
+    public function testColumnCount()
+    {
+        $this->_insertValue();
+        $stmt = self::$con->prepare("select * from people");
+        $this->assertEquals(0, $stmt->columnCount());
+        $stmt->execute();
+        $this->assertEquals(2, $stmt->columnCount());
+    }
+
     /****************************************************************************
      *  Helper functions                                                        *
      ***************************************************************************/
