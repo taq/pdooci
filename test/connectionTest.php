@@ -125,5 +125,15 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
             $this->assertEquals(942, self::$con->errorCode());
         }
     }
+
+    /** 
+     * Test if OCI is present on the available drivers
+     *
+     * @return null
+     */
+    public function testDrivers()
+    {
+        $this->assertTrue(in_array("oci", self::$con->getAvailableDrivers()));
+    }
 }
 ?>

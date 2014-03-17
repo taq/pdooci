@@ -283,7 +283,7 @@ class PDO
      *
      * @return null
      */
-    function errorHandler($errno, $errstr, $errfile, $errline)
+    public function errorHandler($errno, $errstr, $errfile, $errline)
     {
         preg_match('/(ORA-)(\d+)/', $errstr, $ora_error);
         if ($ora_error) {
@@ -291,6 +291,21 @@ class PDO
         } else {
             $this->setError($this->_con);
         }
+    }
+
+    /** 
+     * Return available drivers
+     * Will insert the OCI driver on the list, if not exist
+     *
+     * @return array with drivers
+     */
+    public function getAvailableDrivers()
+    {
+        $drivers = \PDO::getAvailableDrivers();
+        if (!in_array("oci", $drivers)) {
+            array_push($drivers, "oci");
+        }
+        return $drivers;
     }
 }
 ?>
