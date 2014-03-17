@@ -30,6 +30,8 @@ class PDOOCIStatement implements \Iterator
     private $_statement = null;
     private $_stmt      = null;
     private $_fetch_sty = null;
+    private $_current   = null;
+    private $_pos       = 0;
 
     /**
      * Constructor
@@ -128,6 +130,7 @@ class PDOOCIStatement implements \Iterator
                 $rst = \oci_fetch_array($this->_stmt, \OCI_NUM);
                 break;
             }
+            $this->_current = $rst;
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -170,6 +173,13 @@ class PDOOCIStatement implements \Iterator
      */
     public function current()
     {
+        if (!$this->_current) {
+            $this->next();
+            if (!$this->_current) {
+                $this->_pos = -1;
+            }
+        }
+        return $this->_current;
     }
 
     /**
@@ -179,6 +189,7 @@ class PDOOCIStatement implements \Iterator
      */
     public function key() 
     {
+        return $this->_pos;
     }
     
     /**
@@ -188,6 +199,10 @@ class PDOOCIStatement implements \Iterator
      */
     public function next()
     {
+        $this->_current = $this->fetch(\PDO::FETCH_ASSOC);
+        if (!$this->_current) {
+            $this->_pos = -1;
+        }
     }
 
     /**
@@ -197,6 +212,7 @@ class PDOOCIStatement implements \Iterator
      */
     public function rewind()
     {
+        $this->_pos = 0;
     }
     
     /**
@@ -206,6 +222,8 @@ class PDOOCIStatement implements \Iterator
      */
     public function valid()
     {
+        $valid = $this->_pos >= 0;
+        return $valid;
     }
 }
 ?>

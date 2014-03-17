@@ -289,6 +289,22 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($email, $data["EMAIL"]);
     }
 
+    /** 
+     * Return results on a foreach loop
+     *
+     * @return null
+     */
+    public function testForeach()
+    {
+        $this->_insertValue();
+        $this->_insertValue();
+        $rst = array();
+        foreach (self::$con->query("select * from people") as $row) {
+            array_push($rst, $row);
+        }
+        $this->assertEquals(2, sizeof($rst));
+    }
+
     /**
      * Insert a row
      *
