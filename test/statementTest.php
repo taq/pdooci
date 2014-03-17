@@ -362,14 +362,15 @@ class StatementTest extends PHPUnit_Framework_TestCase
      */
     public function testBindNamedValue()
     {
-        $nome = "eustaquio";
+        $name = "eustaquio";
         $this->_insertValue();
         $stmt = self::$con->prepare("select * from people where name=:name");
-        $stmt->bindValue(":name", $nome, \PDO::PARAM_STR);
+        $stmt->bindValue(":name", $name, \PDO::PARAM_STR);
+        $name = "johndoe";
         $stmt->execute();
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
         $stmt->closeCursor();
-        $this->assertEquals($nome, $data["NAME"]);
+        $this->assertEquals("eustaquio", $data["NAME"]);
     }
 
     /**
@@ -379,14 +380,51 @@ class StatementTest extends PHPUnit_Framework_TestCase
      */
     public function testBindNumericValue()
     {
-        $nome = "eustaquio";
+        $name = "eustaquio";
         $this->_insertValue();
         $stmt = self::$con->prepare("select * from people where name=?");
-        $stmt->bindValue(1, $nome, \PDO::PARAM_STR);
+        $stmt->bindValue(1, $name, \PDO::PARAM_STR);
+        $name = "johndoe";
         $stmt->execute();
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
         $stmt->closeCursor();
-        $this->assertEquals($nome, $data["NAME"]);
+        $this->assertEquals("eustaquio", $data["NAME"]);
+    }
+
+    /**
+     * Bind named param
+     *
+     * @return null
+     */
+    public function testBindNamedParam()
+    {
+        $name = "eustaquio";
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->prepare("select * from people where name=:name");
+        $stmt->bindParam(":name", $name, \PDO::PARAM_STR);
+        $name = "johndoe";
+        $stmt->execute();
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals($name, $data["NAME"]);
+    }
+
+    /**
+     * Bind numeric value
+     *
+     * @return null
+     */
+    public function testBindNumericParam()
+    {
+        $name = "eustaquio";
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->prepare("select * from people where name=?");
+        $stmt->bindParam(1, $name, \PDO::PARAM_STR);
+        $name = "johndoe";
+        $stmt->execute();
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals($name, $data["NAME"]);
     }
 
     /****************************************************************************
@@ -396,11 +434,20 @@ class StatementTest extends PHPUnit_Framework_TestCase
     /**
      * Insert a row
      *
+     * @param mixed $values optional values
+     *
      * @return PDOOCIStatement statement
      */
-    private function _insertValue()
+    private function _insertValue($values=null)
     {
-        return self::$con->query("insert into people (name,email) values ('eustaquio','eustaquiorangel@gmail.com')");
+        $name  = "eustaquio";
+        $email = "eustaquiorangel@gmail.com";
+
+        if (!is_null($values)) {
+            $name  = $values["name"];
+            $email = $values["email"];
+        }
+        return self::$con->query("insert into people (name,email) values ('$name','$email')");
     }
 
     /**

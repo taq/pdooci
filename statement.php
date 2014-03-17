@@ -80,6 +80,27 @@ class PDOOCIStatement implements \Iterator
     }
 
     /**
+     * Binds a param
+     *
+     * @param mixed $param  param (column)
+     * @param mixed &$value value for param
+     * @param mixed $type   optional data type
+     *
+     * @return bool bound
+     */
+    public function bindParam($param, &$value, $type=null, $leng=null)
+    {
+        $ok = false;
+        try {
+            $param = $this->_getBindVar($param);
+            $ok    = \oci_bind_by_name($this->_stmt, $param, $value);
+        } catch (Exception $e) {
+            throw new \PDOException($e->getMessage());
+        }
+        return $ok;
+    }
+
+    /**
      * Get the variable name for binding
      *
      * @param mixed $val variable value
