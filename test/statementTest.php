@@ -439,6 +439,38 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $stmt->columnCount());
         $stmt->execute();
         $this->assertEquals(2, $stmt->columnCount());
+        $stmt->closeCursor();
+    }
+
+    /**
+     * Debug dump params
+     *
+     * @return null
+     */
+    public function testDebugDumpParams()
+    {
+        $this->_insertValue();
+        $name = "eustaquio";
+        $email= "eustaquiorangel@gmail.com";
+        $stmt = self::$con->prepare("select * from people where name=:name and email=:email");
+        $stmt->bindParam(":name", $name);
+        $stmt->bindParam(":email", $email);
+        $stmt->execute();
+        $str =<<<END
+SQL: [54] select * from people where name=:name and email=:email
+Params: 2
+Key: Name: [5] :name
+name=[5] ":name"
+is_param=1
+Key: Name: [6] :email
+name=[6] ":email"
+is_param=1
+END;
+        ob_start();
+        $stmt->debugDumpParams();
+        $contents = ob_get_clean();
+        $this->assertEquals($str, $contents);
+        $stmt->closeCursor();
     }
 
     /****************************************************************************

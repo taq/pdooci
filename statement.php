@@ -73,6 +73,7 @@ class PDOOCIStatement implements \Iterator
         try {
             $param = $this->_getBindVar($param);
             $ok    = \oci_bind_by_name($this->_stmt, $param, $value); //, -1, $type);
+            $this->_binds[$param] = $value;
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -85,6 +86,7 @@ class PDOOCIStatement implements \Iterator
      * @param mixed $param  param (column)
      * @param mixed &$value value for param
      * @param mixed $type   optional data type
+     * @param mixed $leng   optional length
      *
      * @return bool bound
      */
@@ -94,6 +96,7 @@ class PDOOCIStatement implements \Iterator
         try {
             $param = $this->_getBindVar($param);
             $ok    = \oci_bind_by_name($this->_stmt, $param, $value);
+            $this->_binds[$param] = $value;
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -399,6 +402,23 @@ class PDOOCIStatement implements \Iterator
             throw new \PDOException($e->getMessage());
         }
         return 0;
+    }
+
+    /**
+     * Debug dump params
+     *
+     * @return string params
+     */
+    public function debugDumpParams()
+    {
+        $str  = "SQL: [".strlen($this->_statement)."] ".$this->_statement."\n";
+        $str .= "Params: ".sizeof($this->_binds)."\n";
+        foreach ($this->_binds as $key => $value) {
+            $str .= "Key: Name: [".strlen($key)."] $key\n";
+            $str .= "name=[".strlen($key)."] \"$key\"\n";
+            $str .= "is_param=1\n";
+        }
+        echo substr($str, 0, strlen($str)-1);
     }
 }
 ?>
