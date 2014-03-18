@@ -595,5 +595,24 @@ class PDOOCIStatement implements \Iterator
     {
         // nothing to see here
     }
+
+    /**
+     * Get column meta data
+     *
+     * @param int $colnum column number
+     *
+     * @return mixed column meta data
+     */
+    public function getColumnMeta($colnum=0)
+    {
+        if (!$this->_stmt) {
+            return null;
+        }
+        $name = \oci_field_name($this->_stmt, $colnum+1);
+        $len  = \oci_field_size($this->_stmt, $colnum+1);
+        $prec = \oci_field_scale($this->_stmt, $colnum+1);
+        $type = \oci_field_type($this->_stmt, $colnum+1);
+        return array("name"=>$name, "len"=>$len, "precision"=>$prec, "driver:decl_type"=>$type);
+    }
 }
 ?>

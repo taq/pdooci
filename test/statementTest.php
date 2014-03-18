@@ -670,6 +670,30 @@ END;
         $stmt->closeCursor();
     }
 
+    /**
+     * Test column meta data
+     *
+     * @return null
+     */
+    public function testMetaData()
+    {
+        $this->_insertValue();
+        $stmt = self::$con->prepare("select * from people");
+        $stmt->execute();
+
+        $data = $stmt->getColumnMeta(0);
+        $this->assertEquals("NAME", $data["name"]);
+        $this->assertEquals(50, $data["len"]);
+        $this->assertEquals(0, $data["precision"]);
+        $this->assertEquals("VARCHAR2", $data["driver:decl_type"]);
+
+        $data = $stmt->getColumnMeta(1);
+        $this->assertEquals("EMAIL", $data["name"]);
+        $this->assertEquals(30, $data["len"]);
+        $this->assertEquals(0, $data["precision"]);
+        $this->assertEquals("VARCHAR2", $data["driver:decl_type"]);
+    }
+
     /****************************************************************************
      *  Helper functions                                                        *
      ***************************************************************************/
