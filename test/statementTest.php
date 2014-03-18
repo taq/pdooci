@@ -694,6 +694,45 @@ END;
         $this->assertEquals("VARCHAR2", $data["driver:decl_type"]);
     }
 
+    /**
+     * Fetch null values
+     *
+     * @return null
+     */
+    public function testFetchNulls()
+    {
+        $this->_insertValue(array("name"=>"johndoe","email"=>null));
+        $stmt = self::$con->prepare("select * from people");
+        $stmt->execute();
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals(2, sizeof($data));
+        $this->assertEquals("johndoe", $data["NAME"]);
+        $this->assertNull($data["EMAIL"]);
+    }
+
+    /**
+     * Fetch all null values
+     *
+     * @return null
+     */
+    public function testFetchAllNulls()
+    {
+        $this->_insertValue(array("name"=>"eustaquio" ,"email"=>null));
+        $this->_insertValue(array("name"=>"johndoe"   ,"email"=>null));
+        $stmt = self::$con->prepare("select * from people");
+        $stmt->execute();
+        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals(2, sizeof($data));
+
+        $this->assertEquals("eustaquio", $data[0]["NAME"]);
+        $this->assertNull($data[0]["EMAIL"]);
+
+        $this->assertEquals("johndoe", $data[1]["NAME"]);
+        $this->assertNull($data[1]["EMAIL"]);
+    }
+
     /****************************************************************************
      *  Helper functions                                                        *
      ***************************************************************************/

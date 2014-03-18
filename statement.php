@@ -213,13 +213,13 @@ class PDOOCIStatement implements \Iterator
             {
             case \PDO::FETCH_BOTH:
             case \PDO::FETCH_BOUND:
-                $rst = \oci_fetch_array($this->_stmt, \OCI_BOTH);
+                $rst = \oci_fetch_array($this->_stmt, \OCI_BOTH + \OCI_RETURN_NULLS);
                 break;
             case \PDO::FETCH_ASSOC:
-                $rst = \oci_fetch_array($this->_stmt, \OCI_ASSOC);
+                $rst = \oci_fetch_array($this->_stmt, \OCI_ASSOC + \OCI_RETURN_NULLS);
                 break;
             case \PDO::FETCH_NUM:
-                $rst = \oci_fetch_array($this->_stmt, \OCI_NUM);
+                $rst = \oci_fetch_array($this->_stmt, \OCI_NUM + OCI_RETURN_NULLS);
                 break;
             }
             $this->_current = $rst;
@@ -247,6 +247,10 @@ class PDOOCIStatement implements \Iterator
         try {
             switch ($style) 
             {
+            case \PDO::FETCH_ASSOC:
+                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
+                break;
+
             case \PDO::FETCH_BOTH:
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM + \OCI_ASSOC);
                 break;
