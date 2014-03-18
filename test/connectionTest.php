@@ -72,6 +72,22 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         $str  = getenv("PDOOCI_str");
         $con  = new PDOOCI\PDO($str, $user, $pwd, array(\PDO::ATTR_PERSISTENT => true));
         $this->assertNotNull($con->getConnection());
+        $this->assertNull($con->getCharset());
+    }
+
+    /**
+     * Test if can connect, using parameters
+     *
+     * @return null
+     */
+    public function testConnectionWithParameters()
+    {
+        $user = getenv("PDOOCI_user");
+        $pwd  = getenv("PDOOCI_pwd");
+        $str  = getenv("PDOOCI_str");
+        $con  = new PDOOCI\PDO("$str;charset=utf8", $user, $pwd);
+        $this->assertNotNull($con->getConnection());
+        $this->assertEquals("utf8", $con->getCharset());
     }
 
     /**

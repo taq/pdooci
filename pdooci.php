@@ -29,6 +29,7 @@ class PDO
     private $_con = null;
     private $_autocommit = true;
     private $_last_error = null;
+    private $_charset    = null;
 
     /** 
      * Class constructor
@@ -46,18 +47,63 @@ class PDO
             throw new \PDOException("No support for Oracle, please install the OCI driver");
         }
 
+        // find charset
+        $charset = null;
+        $tokens  = preg_split('/;/', $data);
+        $data    = $tokens[0];
+        $charset = $this->_getCharset($tokens);
+
         try {
             if (!is_null($options) && array_key_exists(\PDO::ATTR_PERSISTENT, $options)) {
-                $this->_con = \oci_pconnect($username, $password, $data);
+                $this->_con = \oci_pconnect($username, $password, $data, $charset);
                 $this->setError();
             } else {
-                $this->_con = \oci_connect($username, $password, $data);
+                $this->_con = \oci_connect($username, $password, $data, $charset);
                 $this->setError();
             }
         } catch (\Exception $exception) {
             throw new \PDOException($exception->getMessage());
         } 
         return $this;
+    }
+
+    /**
+     * Return the charset
+     *
+     * @return mixed charset
+     */
+    public function getCharset()
+    {
+        return $this->_charset;
+    }
+
+    /**
+     * Find the charset
+     *
+     * @param string $charset charset
+     *
+     * @return charset
+     */
+    private function _getCharset($charset=null)
+    {
+        if (!$charset) {
+            $langs = array_filter(array(getenv("NLS_LANG")), "strlen");
+            return array_shift($langs);
+        }
+
+        $expr   = '/^(charset=)(\w+)$/';
+        $tokens = array_filter(
+            $charset, function ($token) use ($expr) {
+                return preg_match($expr, $token, $matches);
+            }
+        );
+        if (sizeof($tokens)>0) {
+            preg_match($expr, array_shift($tokens), $matches);
+            $this->_charset = $matches[2];
+        } else {
+            $this->_charset = null;
+        }
+        return $this->_charset;
     }
 
     /**
