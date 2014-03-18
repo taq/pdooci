@@ -614,5 +614,15 @@ class PDOOCIStatement implements \Iterator
         $type = \oci_field_type($this->_stmt, $colnum+1);
         return array("name"=>$name, "len"=>$len, "precision"=>$prec, "driver:decl_type"=>$type);
     }
+
+    /**
+     * Dummy method for nextRowSet
+     *
+     * @return bool 
+     */
+    public function nextRowSet()
+    {
+        // TODO: insert some code here if needed
+    }
 }
 ?>
