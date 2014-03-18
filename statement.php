@@ -570,5 +570,30 @@ class PDOOCIStatement implements \Iterator
     {
         return $this->_pdooci->errorInfo();
     }
+
+    /**
+     * Set an attribute
+     *
+     * @param int   $attr  attribute
+     * @param mixed $value value
+     *
+     * @return true if setted
+     */
+    public function setAttribute($attr, $value)
+    {
+        // nothing to see here
+    }
+
+    /**
+     * Get an attribute
+     *
+     * @param int $attr attribute
+     *
+     * @return mixed value
+     */
+    public function getAttribute($attr)
+    {
+        // nothing to see here
+    }
 }
 ?>
