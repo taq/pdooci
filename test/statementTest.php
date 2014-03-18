@@ -294,14 +294,30 @@ class StatementTest extends PHPUnit_Framework_TestCase
      */
     public function testFetchAllWithFuncWithMoreParameters()
     {
-        $this->_insertValueWithExec();
+        $this->_insertValue();
         $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
-        $stmt = self::$con->query("select * from people");
+        $stmt = self::$con->prepare("select * from people");
+        $stmt->execute();
         ob_start();
         $data = $stmt->fetchAll(\PDO::FETCH_FUNC, "useremail");
         $stmt->closeCursor();
         $rst = ob_get_clean();
         $this->assertEquals("name: eustaquio email: eustaquiorangel@gmail.com\nname: johndoe email: johndoe@gmail.com\n", $rst);
+    }
+
+    /**
+     * Fetch column
+     *
+     * @return null
+     */
+    public function testFetchColumn()
+    {
+        $this->_insertValue();
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->prepare("select * from people");
+        $stmt->execute();
+        $this->assertEquals("eustaquio", $stmt->fetchColumn());
+        $this->assertEquals("johndoe@gmail.com", $stmt->fetchColumn(1));
     }
 
     /**

@@ -316,6 +316,19 @@ class PDOOCIStatement implements \Iterator
     }
 
     /**
+     * Fetch column
+     *
+     * @param int $colnum optional column number
+     *
+     * @return mixed column value
+     */
+    public function fetchColumn($colnum=0)
+    {
+        $rst = $this->fetch(\PDO::FETCH_NUM);
+        return $rst[$colnum];
+    }
+
+    /**
      * Convert a query to use bind marks
      *
      * @param string $query to insert bind marks
