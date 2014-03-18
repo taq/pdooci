@@ -151,9 +151,8 @@ class PDOOCIStatement implements \Iterator
             }
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
-        } finally {
-            restore_error_handler();
         }
+        restore_error_handler();
         return $ok;
     }
 
@@ -170,9 +169,8 @@ class PDOOCIStatement implements \Iterator
             $rows = \oci_num_rows($this->_stmt);
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
-        } finally {
-            restore_error_handler();
         }
+        restore_error_handler();
         return $rows;
     }
 
@@ -188,9 +186,8 @@ class PDOOCIStatement implements \Iterator
             \oci_free_statement($this->_stmt);
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
-        } finally {
-            restore_error_handler();
         }
+        restore_error_handler();
         $this->_stmt = null;
     }
 
@@ -226,9 +223,8 @@ class PDOOCIStatement implements \Iterator
             $this->_checkBinds();
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
-        } finally {
-            restore_error_handler();
-        }
+        } 
+        restore_error_handler();
         return $rst;
     }
 
