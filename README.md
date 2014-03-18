@@ -1,20 +1,20 @@
 PDOCI
 =====
 
-Wrapping on PHP OCI functions to simulate a PDO object, since PDO support for OCI is very confuse and slow.
+Wrapping on PHP OCI functions to simulate a PDO object, using just pure PHP and the oci_* functions.
 
 Let's face it. Installing PHP, PDO, Oracle drivers and PDO OCI is not a pleasant
 task. Is more pleasant to insert bamboo sticks under your fingernails than make
 all the voodoo needed to accomplish that task. And there are two big problems
 with that:
 
-1. If you install `pdo_oci` with `pecl` you'll get a version from 2005. Even
-   Christian Bale is now far from the things from 2005, and wow, he had a cool
-   costume and a very nice car.
+1. If you install `pdo_oci` with `pecl` you'll get a version from 2005 (http://pecl.php.net/package/PDO_OCI). 
+   Even Christian Bale is now far from the things from 2005, and wow, he had a cool suit and a very nice car. 
+   And all came in black.
 
 2. If you follow the official docs, you'll need to compile PHP and still get an
-   *experimental* feature. Come on. We can't (yeah, we know how to do it!)
-   compile PHP on every server we need and just for an experimental feature?
+   *experimental* extension (http://www.php.net/manual/ref.pdo-oci.php). Come on. 
+   We can't (yeah, we know how to do it!) compile PHP on every server we need and just for an experimental feature?
 
 That's why I made `PDOOCI`.
 
