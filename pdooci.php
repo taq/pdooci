@@ -8,7 +8,7 @@
  * @package  PDOOCI
  * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
- * @link     http://github.com/taq/pdoci
+ * @link     http://github.com/taq/pdooci
  */
 namespace PDOOCI;
 require_once "statement.php";
@@ -22,7 +22,7 @@ require_once "statement.php";
  * @package  PDOOCI
  * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
- * @link     http://github.com/taq/pdoci
+ * @link     http://github.com/taq/pdooci
  */
 class PDO
 {

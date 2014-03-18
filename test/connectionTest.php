@@ -8,7 +8,7 @@
  * @package  PDOOCI
  * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
- * @link     http://github.com/taq/pdoci
+ * @link     http://github.com/taq/pdooci
  */
 require_once "../pdooci.php";
 
@@ -21,7 +21,7 @@ require_once "../pdooci.php";
  * @package  PDOOCI
  * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
- * @link     http://github.com/taq/pdoci
+ * @link     http://github.com/taq/pdooci
  */
 class ConnectionTest extends PHPUnit_Framework_TestCase
 {

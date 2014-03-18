@@ -8,21 +8,63 @@
  * @package  PDOOCI
  * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
- * @link     http://github.com/taq/pdoci
+ * @link     http://github.com/taq/pdooci
  */
 require_once "../pdooci.php";
 require_once "../statement.php";
+
+/**
+ * Class for use with fetch and \PDO::FETCH_CLASS option
+ *
+ * PHP version 5.3
+ *
+ * @category Test
+ * @package  PDOOCI
+ * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
+ * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
+ * @link     http://github.com/taq/pdooci
+ */
+class User
+{
+    public $name;
+    public $email;
+}
+
+/**
+ * Print user name
+ *
+ * @param string $name user name
+ *
+ * @return null
+ */
+function user($name)
+{
+    echo "name: $name\n";
+}
+
+/**
+ * Print user name and email
+ *
+ * @param string $name  user name
+ * @param string $email user email
+ *
+ * @return null
+ */
+function useremail($name, $email)
+{
+    echo "name: $name email: $email\n";
+}
 
 /**
  * Testing statement
  *
  * PHP version 5.3
  *
- * @category Connection
+ * @category Test
  * @package  PDOOCI
  * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
- * @link     http://github.com/taq/pdoci
+ * @link     http://github.com/taq/pdooci
  */
 class StatementTest extends PHPUnit_Framework_TestCase
 {
@@ -139,6 +181,127 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, sizeof($data));
         $this->assertEquals("eustaquio", $data[0]);
         $this->assertEquals("eustaquiorangel@gmail.com", $data[1]);
+    }
+
+    /**
+     * Test fetch all
+     *
+     * @return null
+     */
+    public function testFetchAll()
+    {
+        $this->_insertValueWithExec();
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetchAll();
+        $stmt->closeCursor();
+        $this->assertEquals(2, sizeof($data));
+        $this->assertEquals("eustaquio", $data[0][0]);
+        $this->assertEquals("eustaquiorangel@gmail.com", $data[0][1]);
+        $this->assertEquals("johndoe", $data[1][0]);
+        $this->assertEquals("johndoe@gmail.com", $data[1][1]);
+    }
+
+    /**
+     * Test fetch all with column
+     *
+     * @return null
+     */
+    public function testFetchAllWithColumn()
+    {
+        $this->_insertValueWithExec();
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetchAll(\PDO::FETCH_COLUMN, 0);
+        $stmt->closeCursor();
+        $this->assertEquals(2, sizeof($data));
+        $this->assertEquals(1, sizeof($data[0]));
+        $this->assertEquals("eustaquio", $data[0]);
+        $this->assertEquals(1, sizeof($data[1]));
+        $this->assertEquals("johndoe", $data[1]);
+    }
+
+    /**
+     * Test fetch all with column and group
+     *
+     * @return null
+     */
+    public function testFetchAllWithColumnAndGroup()
+    {
+        $this->_insertValueWithExec();
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@yahoo.com"));
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetchAll(\PDO::FETCH_COLUMN|\PDO::FETCH_GROUP);
+        $stmt->closeCursor();
+
+        $this->assertEquals(2, sizeof($data));
+        $this->assertEquals(1, sizeof($data["eustaquio"]));
+        $this->assertEquals("eustaquiorangel@gmail.com", $data["eustaquio"][0]);
+        $this->assertEquals(2, sizeof($data["johndoe"]));
+        $this->assertEquals("johndoe@yahoo.com", $data["johndoe"][0]);
+        $this->assertEquals("johndoe@gmail.com", $data["johndoe"][1]);
+    }
+
+    /**
+     * Test fetch all with class
+     *
+     * @return null
+     */
+    public function testFetchAllWithClass()
+    {
+        $this->_insertValueWithExec();
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetchAll(\PDO::FETCH_CLASS, "User");
+        $stmt->closeCursor();
+        $this->assertEquals(2, sizeof($data));
+
+        $cls = $data[0];
+        $this->assertTrue(is_object($cls));
+        $this->assertEquals("User", get_class($cls));
+        $this->assertEquals("eustaquio", $cls->name);
+        $this->assertEquals("eustaquiorangel@gmail.com", $cls->email);
+
+        $cls = $data[1];
+        $this->assertTrue(is_object($cls));
+        $this->assertEquals("User", get_class($cls));
+        $this->assertEquals("johndoe", $cls->name);
+        $this->assertEquals("johndoe@gmail.com", $cls->email);
+    }
+
+    /**
+     * Test fetch all with function
+     *
+     * @return null
+     */
+    public function testFetchAllWithFunc()
+    {
+        $this->_insertValueWithExec();
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->query("select * from people");
+        ob_start();
+        $data = $stmt->fetchAll(\PDO::FETCH_FUNC, "user");
+        $stmt->closeCursor();
+        $rst = ob_get_clean();
+        $this->assertEquals("name: eustaquio\nname: johndoe\n", $rst);
+    }
+
+    /**
+     * Test fetch all with function with more than one parameter
+     *
+     * @return null
+     */
+    public function testFetchAllWithFuncWithMoreParameters()
+    {
+        $this->_insertValueWithExec();
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->query("select * from people");
+        ob_start();
+        $data = $stmt->fetchAll(\PDO::FETCH_FUNC, "useremail");
+        $stmt->closeCursor();
+        $rst = ob_get_clean();
+        $this->assertEquals("name: eustaquio email: eustaquiorangel@gmail.com\nname: johndoe email: johndoe@gmail.com\n", $rst);
     }
 
     /**

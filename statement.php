@@ -8,7 +8,7 @@
  * @package  PDOOCI
  * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
- * @link     http://github.com/taq/pdoci
+ * @link     http://github.com/taq/pdooci
  */
 namespace PDOOCI;
 
@@ -21,7 +21,7 @@ namespace PDOOCI;
  * @package  PDOOCI
  * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
- * @link     http://github.com/taq/pdoci
+ * @link     http://github.com/taq/pdooci
  */
 class PDOOCIStatement implements \Iterator
 {
@@ -233,6 +233,89 @@ class PDOOCIStatement implements \Iterator
     }
 
     /**
+     * Fetch all
+     *
+     * @param mixed $style    fetch style
+     * @param mixed $argument fetch argument
+     *
+     * @return mixed results
+     */
+    public function fetchAll($style=null, $argument=null)
+    {
+        $style = is_null($style) ? \PDO::FETCH_BOTH : $style;
+        $rst   = null;
+        try {
+            switch ($style) 
+            {
+            case \PDO::FETCH_BOTH:
+                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM + \OCI_ASSOC);
+                break;
+
+            case \PDO::FETCH_COLUMN:
+                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
+                $rst = array_map(
+                    function ($vals) use ($argument) {
+                        return $vals[intval($argument)];
+                    }, $rst
+                );
+                break;
+
+            case \PDO::FETCH_COLUMN|\PDO::FETCH_GROUP:
+                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
+                $temp = array();
+                foreach ($rst as $key => $value) {
+                    if (!array_key_exists($value[0], $temp)) {
+                        $temp[$value[0]] = array();
+                    }
+                    array_push($temp[$value[0]], $value[1]);
+                }
+                $rst = $temp;
+                break;
+
+            case \PDO::FETCH_CLASS:
+                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
+                $temp = array();
+                foreach ($rst as $idx => $data) {
+                    $cls = new $argument();
+                    foreach ($data as $key => $value) {
+                        if (!array_key_exists(strtolower($key), get_object_vars($cls))) {
+                            var_dump(get_object_vars($cls));
+                            continue;
+                        }
+                        $key = strtolower($key);
+                        $cls->$key = $value;
+                    }
+                    array_push($temp, $cls);
+                }
+                $rst  = $temp;
+                break;
+
+            case \PDO::FETCH_FUNC:
+                if (!function_exists($argument)) {
+                    throw new \PDOException("Function $argument does not exists");
+                }
+                $ref  = new \ReflectionFunction($argument);
+                $args = $ref->getNumberOfParameters();
+                if ($args<1) {
+                    throw new \PDOException("Function $argument can't receive parameters");
+                }
+                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
+                foreach ($rst as $idx => $value) {
+                    $temp = array();
+                    foreach ($value as $key => $data) {
+                        array_push($temp, $data);
+                    }
+                    call_user_func_array($argument, $temp);
+                }
+                break;
+            }
+        } catch (Exception $e) {
+            throw new \PDOException($e->getMessage());
+        }
+        return $rst;
+    }
+
+    /**
      * Convert a query to use bind marks
      *
      * @param string $query to insert bind marks
@@ -419,6 +502,26 @@ class PDOOCIStatement implements \Iterator
             $str .= "is_param=1\n";
         }
         echo substr($str, 0, strlen($str)-1);
+    }
+
+    /**
+     * Return error code
+     *
+     * @return mixed error code
+     */
+    public function errorCode()
+    {
+        return $this->_pdooci->errorCode();
+    }
+
+    /**
+     * Return error info
+     *
+     * @return mixed error info
+     */
+    public function errorInfo()
+    {
+        return $this->_pdooci->errorInfo();
     }
 }
 ?>
