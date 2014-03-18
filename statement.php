@@ -276,16 +276,7 @@ class PDOOCIStatement implements \Iterator
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
                 $temp = array();
                 foreach ($rst as $idx => $data) {
-                    $cls = new $argument();
-                    foreach ($data as $key => $value) {
-                        if (!array_key_exists(strtolower($key), get_object_vars($cls))) {
-                            var_dump(get_object_vars($cls));
-                            continue;
-                        }
-                        $key = strtolower($key);
-                        $cls->$key = $value;
-                    }
-                    array_push($temp, $cls);
+                    array_push($temp, $this->_createObjectFromData($argument, $data));
                 }
                 $rst  = $temp;
                 break;
@@ -326,6 +317,49 @@ class PDOOCIStatement implements \Iterator
     {
         $rst = $this->fetch(\PDO::FETCH_NUM);
         return $rst[$colnum];
+    }
+
+    /**
+     * Fetch data and create an object
+     *
+     * @param string $name class name
+     *
+     * @return mixed object
+     */
+    public function fetchObject($name)
+    {
+        try {
+            $data = $this->fetch(\PDO::FETCH_ASSOC);
+            return $this->_createObjectFromData($name, $data);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Create a new object from data
+     *
+     * @param string $name class name
+     * @param mixed  $data data to use on class
+     *
+     * @return new object
+     */
+    private function _createObjectFromData($name, $data)
+    {
+        try {
+            $cls = new $name();
+            foreach ($data as $key => $value) {
+                if (!array_key_exists(strtolower($key), get_object_vars($cls))) {
+                    var_dump(get_object_vars($cls));
+                    continue;
+                }
+                $key = strtolower($key);
+                $cls->$key = $value;
+            }
+            return $cls;
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     /**

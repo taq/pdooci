@@ -321,6 +321,24 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test fetch object
+     *
+     * @return null
+     */
+    public function testFetchObject()
+    {
+        $this->_insertValueWithExec();
+        $stmt = self::$con->query("select * from people");
+        $obj  = $stmt->fetchObject("User");
+        $stmt->closeCursor();
+
+        $this->assertTrue(is_object($obj));
+        $this->assertEquals("User", get_class($obj));
+        $this->assertEquals("eustaquio", $obj->name);
+        $this->assertEquals("eustaquiorangel@gmail.com", $obj->email);
+    }
+
+    /**
      * Test autocommit off and rollback
      *
      * @return null
