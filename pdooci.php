@@ -11,7 +11,7 @@
  * @link     http://github.com/taq/pdooci
  */
 namespace PDOOCI;
-require_once "statement.php";
+require_once dirname(__FILE__)."/statement.php";
 
 /**
  * Main class of PDOCI
