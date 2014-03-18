@@ -22,8 +22,8 @@ What is needed
 --------------
 
 Just install the Oracle drivers (I like the instant client versions) and the
-`oci8` package (with `pecl`, this one seems to be updated often). Then insert
-the `pdooci.php` file and change some code like
+`oci8` package (with `pecl`, this one seems to be updated often). Then require
+the `pdooci.php` file and change some existing code like
 
 ```
 $pdo = new PDO("oci:dbname=mydatabase;charset=utf8", "user", "password");
@@ -32,7 +32,31 @@ $pdo = new PDO("oci:dbname=mydatabase;charset=utf8", "user", "password");
 to 
 
 ```
-$pdo = new PDOOCI\PDO("oci:dbname=mydatabase;charset=utf8", "user", "password");
+require_once "pdooci.php";
+
+$pdo = new PDOOCI\PDO("mydatabase", "user", "password");
 ```
 
-Yeah, the rest should work. :-)
+Yeah, the rest should work exactly the same as if you were using a PDO object. :-)
+
+Testing
+-------
+
+There is a test suite (using `PHPUnit`) on the `test` directory. If you want to
+test (you must test your code!), create a table called `people` with two
+columns:
+
+1. `name` as `varchar2(50)`
+2. `email` as `varchar2(30)` 
+
+And some environment variables:
+
+1. `PDOOCI_user` with the database user name
+2. `PDOOCI_pwd` with the database password
+3. `PDOOCI_str` with the database connection string
+
+And then go to the `test` dir and run `PHPUnit` like:
+
+```
+phpunit --colors .
+```
