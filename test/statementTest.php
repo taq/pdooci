@@ -203,6 +203,48 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test fetch all assoc
+     *
+     * @return null
+     */
+    public function testFetchAllAssoc()
+    {
+        $this->_insertValueWithExec();
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals(2, sizeof($data));
+        $this->assertEquals("eustaquio", $data[0]["NAME"]);
+        $this->assertEquals("eustaquiorangel@gmail.com", $data[0]["EMAIL"]);
+        $this->assertEquals("johndoe", $data[1]["NAME"]);
+        $this->assertEquals("johndoe@gmail.com", $data[1]["EMAIL"]);
+    }
+
+    /**
+     * Test fetch all both
+     *
+     * @return null
+     */
+    public function testFetchAllBoth()
+    {
+        $this->_insertValueWithExec();
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetchAll(\PDO::FETCH_BOTH);
+        $stmt->closeCursor();
+        $this->assertEquals(2, sizeof($data));
+        // $this->assertEquals("eustaquio", $data[0]["NAME"]);
+        $this->assertEquals("eustaquio", $data[0][0]);
+        // $this->assertEquals("eustaquiorangel@gmail.com", $data[0]["EMAIL"]);
+        $this->assertEquals("eustaquiorangel@gmail.com", $data[0][1]);
+        // $this->assertEquals("johndoe", $data[1]["NAME"]);
+        $this->assertEquals("johndoe", $data[1][0]);
+        // $this->assertEquals("johndoe@gmail.com", $data[1]["EMAIL"]);
+        $this->assertEquals("johndoe@gmail.com", $data[1][1]);
+    }
+
+    /**
      * Test fetch all with column
      *
      * @return null
