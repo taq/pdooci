@@ -72,7 +72,7 @@ class PDOOCIStatement implements \Iterator
         $ok = false;
         try {
             $param = $this->_getBindVar($param);
-            $ok    = \oci_bind_by_name($this->_stmt, $param, $value); //, -1, $type);
+            $ok    = \oci_bind_by_name($this->_stmt, $param, $value);
             $this->_binds[$param] = $value;
         } catch (Exception $e) {
             throw new \PDOException($e->getMessage());
@@ -402,6 +402,7 @@ class PDOOCIStatement implements \Iterator
             $this->next();
             if (!$this->_current) {
                 $this->_pos = -1;
+                $this->closeCursor();
             }
         }
         return $this->_current;
