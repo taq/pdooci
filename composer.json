@@ -1,0 +1,19 @@
+{
+    "name": "taq/pdooci",
+    "type": "library",
+    "description": "Replacement for the PHP PDO OCI class",
+    "keywords": ["oracle","oci","pdo","pdo_oci"],
+    "homepage": "http://github.com/taq/pdooci",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Eustaquio Rangel",
+            "email": "eustaquiorangel@gmail.com",
+            "homepage": "http://eustaquiorangel.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
