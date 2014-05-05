@@ -61,6 +61,10 @@ class PDO
                 $this->_con = \oci_connect($username, $password, $data, $charset);
                 $this->setError();
             }
+            if (!$this->_con) {
+                $error = oci_error();
+                throw new \Exception($error['code'].': '.$error['message']);
+            }
         } catch (\Exception $exception) {
             throw new \PDOException($exception->getMessage());
         } 
