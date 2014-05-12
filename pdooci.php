@@ -196,6 +196,8 @@ class PDO
         {
         case \PDO::ATTR_AUTOCOMMIT:
             return $this->_autocommit;
+        case \PDO::ATTR_DRIVER_NAME:
+            return 'oci';
         }
         return null;
     }
