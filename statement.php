@@ -218,6 +218,9 @@ class PDOOCIStatement implements \Iterator
             case \PDO::FETCH_NUM:
                 $rst = \oci_fetch_array($this->_stmt, \OCI_NUM + OCI_RETURN_NULLS);
                 break;
+            case \PDO::FETCH_OBJ:
+                $rst = \oci_fetch_object($this->_stmt);
+                break;
             }
             $this->_current = $rst;
             $this->_checkBinds();

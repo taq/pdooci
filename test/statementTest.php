@@ -184,6 +184,21 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test a fetch with PDO::FETCH_OBJ
+     *
+     * @return null
+     */
+    public function testFetchObj()
+    {
+        $this->_insertValueWithExec();
+        $stmt = self::$con->query("select * from people");
+        $data = $stmt->fetch(\PDO::FETCH_OBJ);
+        $stmt->closeCursor();
+        $this->assertEquals("eustaquio", $data->NAME);
+        $this->assertEquals("eustaquiorangel@gmail.com", $data->EMAIL);
+    }
+
+    /**
      * Test fetch all
      *
      * @return null
