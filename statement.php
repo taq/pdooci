@@ -13,7 +13,7 @@
 namespace PDOOCI;
 
 /**
- * State,emt class of PDOCI
+ * State,emt class of PDOOCI
  *
  * PHP version 5.3
  *
@@ -167,7 +167,7 @@ class PDOOCIStatement implements \Iterator
         $rows = null;
         try {
             $rows = \oci_num_rows($this->_stmt);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         restore_error_handler();
@@ -184,7 +184,7 @@ class PDOOCIStatement implements \Iterator
         set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
             \oci_free_statement($this->_stmt);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         restore_error_handler();
@@ -206,7 +206,7 @@ class PDOOCIStatement implements \Iterator
             $this->_fetch_sty = $style;
             $rst   = null;
 
-            switch ($style) 
+            switch ($style)
             {
             case \PDO::FETCH_BOTH:
             case \PDO::FETCH_BOUND:
@@ -224,9 +224,9 @@ class PDOOCIStatement implements \Iterator
             }
             $this->_current = $rst;
             $this->_checkBinds();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
-        } 
+        }
         restore_error_handler();
         return $rst;
     }
@@ -244,7 +244,7 @@ class PDOOCIStatement implements \Iterator
         $style = is_null($style) ? \PDO::FETCH_BOTH : $style;
         $rst   = null;
         try {
-            switch ($style) 
+            switch ($style)
             {
             case \PDO::FETCH_ASSOC:
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
@@ -329,12 +329,12 @@ class PDOOCIStatement implements \Iterator
      *
      * @return mixed object
      */
-    public function fetchObject($name)
+    public function fetchObject($name='stdClass')
     {
         try {
             $data = $this->fetch(\PDO::FETCH_ASSOC);
             return $this->_createObjectFromData($name, $data);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -352,7 +352,7 @@ class PDOOCIStatement implements \Iterator
         try {
             $cls = new $name();
             foreach ($data as $key => $value) {
-                if (!array_key_exists(strtolower($key), get_object_vars($cls))) {
+                if ($name !== 'stdClass' && !array_key_exists(strtolower($key), get_object_vars($cls))) {
                     var_dump(get_object_vars($cls));
                     continue;
                 }
@@ -416,11 +416,11 @@ class PDOOCIStatement implements \Iterator
      *
      * @return null
      */
-    public function key() 
+    public function key()
     {
         return $this->_pos;
     }
-    
+
     /**
      * Return the next value
      *
@@ -444,7 +444,7 @@ class PDOOCIStatement implements \Iterator
     {
         $this->_pos = 0;
     }
-    
+
     /**
      * Check if the current value is valid
      *
@@ -622,7 +622,7 @@ class PDOOCIStatement implements \Iterator
     /**
      * Dummy method for nextRowSet
      *
-     * @return bool 
+     * @return bool
      */
     public function nextRowSet()
     {
