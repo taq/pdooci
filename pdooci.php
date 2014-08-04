@@ -31,7 +31,7 @@ class PDO extends \PDO
     private $_last_error = null;
     private $_charset    = null;
 
-    /** 
+    /**
      * Class constructor
      *
      * @param string $data     the connection string
@@ -67,7 +67,7 @@ class PDO extends \PDO
             }
         } catch (\Exception $exception) {
             throw new \PDOException($exception->getMessage());
-        } 
+        }
         return $this;
     }
 
@@ -115,7 +115,7 @@ class PDO extends \PDO
      *
      * @return connection handle
      */
-    public function getConnection() 
+    public function getConnection()
     {
         return $this->_con;
     }
@@ -140,7 +140,7 @@ class PDO extends \PDO
             $this->setError();
             return $stmt;
         } catch (Exception $e) {
-            throw new \PDOException($exception->getMessage());
+            throw new \PDOException($e->getMessage());
         }
         return $stmt;
     }
@@ -345,7 +345,7 @@ class PDO extends \PDO
         }
     }
 
-    /** 
+    /**
      * Return available drivers
      * Will insert the OCI driver on the list, if not exist
      *
