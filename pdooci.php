@@ -24,7 +24,7 @@ require_once dirname(__FILE__)."/statement.php";
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-class PDO
+class PDO extends \PDO
 {
     private $_con = null;
     private $_autocommit = true;
@@ -351,7 +351,7 @@ class PDO
      *
      * @return array with drivers
      */
-    public function getAvailableDrivers()
+    public static function getAvailableDrivers()
     {
         $drivers = \PDO::getAvailableDrivers();
         if (!in_array("oci", $drivers)) {
