@@ -1,5 +1,5 @@
 {
-    "name": "taq/pdooci",
+    "name": "terah/pdooci",
     "type": "library",
     "description": "Replacement for the PHP PDO OCI class",
     "keywords": ["oracle","oci","pdo","pdo_oci"],
