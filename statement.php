@@ -25,6 +25,7 @@ namespace PDOOCI;
  */
 class PDOOCIStatement implements \Iterator
 {
+    /* var PDO $_pdooci */
     private $_pdooci    = null;
     private $_con       = null;
     private $_statement = null;
@@ -38,12 +39,13 @@ class PDOOCIStatement implements \Iterator
     /**
      * Constructor
      *
-     * @param resource $pdooci    PDOOCI connection
+     * @param PDO $pdooci    PDOOCI connection
      * @param string   $statement sql statement
      *
-     * @return PDOOCI\Statement $statement created
+     * @return PDOOCIStatement $statement created
+     * @throws \PDOException
      */
-    public function __construct($pdooci, $statement)
+    public function __construct(PDO $pdooci, $statement)
     {
         try {
             $this->_pdooci    = $pdooci;
@@ -53,7 +55,7 @@ class PDOOCIStatement implements \Iterator
             $this->_fetch_sty = \PDO::FETCH_BOTH;
 
             $this->queryString = $this->_statement;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
     }
@@ -66,6 +68,7 @@ class PDOOCIStatement implements \Iterator
      * @param mixed $type  optional data type
      *
      * @return bool bound
+     * @throws \PDOException
      */
     public function bindValue($param, $value, $type=null)
     {
@@ -74,7 +77,7 @@ class PDOOCIStatement implements \Iterator
             $param = $this->_getBindVar($param);
             $ok    = \oci_bind_by_name($this->_stmt, $param, $value);
             $this->_binds[$param] = $value;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         return $ok;
@@ -89,15 +92,15 @@ class PDOOCIStatement implements \Iterator
      * @param mixed $leng   optional length
      *
      * @return bool bound
+     * @throws \PDOException
      */
     public function bindParam($param, &$value, $type=null, $leng=null)
     {
-        $ok = false;
         try {
             $param = $this->_getBindVar($param);
             $ok    = \oci_bind_by_name($this->_stmt, $param, $value);
             $this->_binds[$param] = $value;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         return $ok;
@@ -108,7 +111,7 @@ class PDOOCIStatement implements \Iterator
      *
      * @param mixed $val variable value
      *
-     * @return string corrent name for binding
+     * @return string correct name for binding
      */
     private function _getBindVar($val)
     {
@@ -123,11 +126,11 @@ class PDOOCIStatement implements \Iterator
      *
      * @param mixed $values optional values
      *
-     * @return this object
+     * @return boolean
+     * @throws \PDOException
      */
     public function execute($values=null)
     {
-        $ok = false;
         set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
             $this->_pdooci->getAutoCommit();
@@ -149,7 +152,7 @@ class PDOOCIStatement implements \Iterator
                 $error = $this->_pdooci->errorInfo();
                 throw new \PDOException($error[2]);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         restore_error_handler();
@@ -160,6 +163,7 @@ class PDOOCIStatement implements \Iterator
      * Get the number of affected rows
      *
      * @return int number of rows
+     * @throws \PDOException
      */
     public function rowCount()
     {
@@ -178,6 +182,7 @@ class PDOOCIStatement implements \Iterator
      * Close the current cursor
      *
      * @return null
+     * @throws \PDOException
      */
     public function closeCursor()
     {
@@ -197,6 +202,7 @@ class PDOOCIStatement implements \Iterator
      * @param int $style to fetch values
      *
      * @return mixed
+     * @throws \PDOException
      */
     public function fetch($style=null)
     {
@@ -238,6 +244,7 @@ class PDOOCIStatement implements \Iterator
      * @param mixed $argument fetch argument
      *
      * @return mixed results
+     * @throws \PDOException
      */
     public function fetchAll($style=null, $argument=null)
     {
@@ -266,7 +273,7 @@ class PDOOCIStatement implements \Iterator
             case \PDO::FETCH_COLUMN|\PDO::FETCH_GROUP:
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
                 $temp = array();
-                foreach ($rst as $key => $value) {
+                foreach ($rst as $value) {
                     if (!array_key_exists($value[0], $temp)) {
                         $temp[$value[0]] = array();
                     }
@@ -278,7 +285,7 @@ class PDOOCIStatement implements \Iterator
             case \PDO::FETCH_CLASS:
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
                 $temp = array();
-                foreach ($rst as $idx => $data) {
+                foreach ($rst as $data) {
                     array_push($temp, $this->_createObjectFromData($argument, $data));
                 }
                 $rst  = $temp;
@@ -294,7 +301,7 @@ class PDOOCIStatement implements \Iterator
                     throw new \PDOException("Function $argument can't receive parameters");
                 }
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
-                foreach ($rst as $idx => $value) {
+                foreach ($rst as $value) {
                     $temp = array();
                     foreach ($value as $key => $data) {
                         array_push($temp, $data);
@@ -303,7 +310,7 @@ class PDOOCIStatement implements \Iterator
                 }
                 break;
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         return $rst;
@@ -345,7 +352,7 @@ class PDOOCIStatement implements \Iterator
      * @param string $name class name
      * @param mixed  $data data to use on class
      *
-     * @return new object
+     * @return \stdClass
      */
     private function _createObjectFromData($name, $data)
     {
@@ -360,7 +367,7 @@ class PDOOCIStatement implements \Iterator
                 $cls->$key = $value;
             }
             return $cls;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -370,7 +377,7 @@ class PDOOCIStatement implements \Iterator
      *
      * @param string $query to insert bind marks
      *
-     * @return query with bind marks
+     * @return string query with bind marks
      */
     public static function insertMarks($query)
     {
@@ -524,6 +531,7 @@ class PDOOCIStatement implements \Iterator
      * Column count
      *
      * @return int column count or zero if not executed
+     * @throws \PDOException
      */
     public function columnCount()
     {
@@ -532,10 +540,9 @@ class PDOOCIStatement implements \Iterator
         }
         try {
             return \oci_num_fields($this->_stmt);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
-        return 0;
     }
 
     /**
@@ -629,4 +636,3 @@ class PDOOCIStatement implements \Iterator
         // TODO: insert some code here if needed
     }
 }
-?>
