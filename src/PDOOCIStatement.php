@@ -13,7 +13,7 @@
 namespace PDOOCI;
 
 /**
- * State,emt class of PDOOCI
+ * Statement class of PDOOCI
  *
  * PHP version 5.3
  *
@@ -23,7 +23,7 @@ namespace PDOOCI;
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-class PDOOCIStatement implements \Iterator
+class PDOOCIStatement extends \PDOStatement
 {
     /* var PDO $_pdooci */
     private $_pdooci    = null;
@@ -34,8 +34,7 @@ class PDOOCIStatement implements \Iterator
     private $_current   = null;
     private $_pos       = 0;
     private $_binds     = array();
-    public  $queryString= "";
-
+    protected $_queryString = '';
     /**
      * Constructor
      *
@@ -54,7 +53,7 @@ class PDOOCIStatement implements \Iterator
             $this->_stmt      = \oci_parse($this->_con, $this->_statement);
             $this->_fetch_sty = \PDO::FETCH_BOTH;
 
-            $this->queryString = $this->_statement;
+            $this->_queryString = $this->_statement;
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -94,12 +93,12 @@ class PDOOCIStatement implements \Iterator
      * @return bool bound
      * @throws \PDOException
      */
-    public function bindParam($param, &$value, $type=null, $leng=null)
+    public function bindParam($paramno, &$param, $type=null, $maxlen=null, $driverdata=null)
     {
         try {
-            $param = $this->_getBindVar($param);
-            $ok    = \oci_bind_by_name($this->_stmt, $param, $value);
-            $this->_binds[$param] = $value;
+            $paramno    = $this->_getBindVar($paramno);
+            $ok         = \oci_bind_by_name($this->_stmt, $paramno, $param);
+            $this->_binds[$paramno] = $param;
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -199,16 +198,17 @@ class PDOOCIStatement implements \Iterator
     /**
      * Fetch a value
      *
-     * @param int $style to fetch values
+     * @param null $how
+     * @param null $orientation
+     * @param null $offset
      *
-     * @return mixed
-     * @throws \PDOException
+     * @return array|mixed|null|object
      */
-    public function fetch($style=null)
+    public function fetch($how = NULL, $orientation = NULL, $offset = NULL)
     {
         set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
-            $style = !$style ? $this->_fetch_sty : $style;
+            $style = !$how ? $this->_fetch_sty : $how;
             $this->_fetch_sty = $style;
             $rst   = null;
 
@@ -240,15 +240,15 @@ class PDOOCIStatement implements \Iterator
     /**
      * Fetch all
      *
-     * @param mixed $style    fetch style
-     * @param mixed $argument fetch argument
+     * @param null $how
+     * @param null $class_name
+     * @param null $ctor_args
      *
-     * @return mixed results
-     * @throws \PDOException
+     * @return array|null
      */
-    public function fetchAll($style=null, $argument=null)
+    public function fetchAll($how=null, $class_name=null, $ctor_args=null)
     {
-        $style = is_null($style) ? \PDO::FETCH_BOTH : $style;
+        $style = is_null($how) ? \PDO::FETCH_BOTH : $how;
         $rst   = null;
         try {
             switch ($style)
@@ -264,8 +264,8 @@ class PDOOCIStatement implements \Iterator
             case \PDO::FETCH_COLUMN:
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
                 $rst = array_map(
-                    function ($vals) use ($argument) {
-                        return $vals[intval($argument)];
+                    function ($vals) use ($class_name) {
+                        return $vals[intval($class_name)];
                     }, $rst
                 );
                 break;
@@ -286,19 +286,19 @@ class PDOOCIStatement implements \Iterator
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
                 $temp = array();
                 foreach ($rst as $data) {
-                    array_push($temp, $this->_createObjectFromData($argument, $data));
+                    array_push($temp, $this->_createObjectFromData($class_name, $data));
                 }
                 $rst  = $temp;
                 break;
 
             case \PDO::FETCH_FUNC:
-                if (!function_exists($argument)) {
-                    throw new \PDOException("Function $argument does not exists");
+                if (!function_exists($class_name)) {
+                    throw new \PDOException("Function $class_name does not exists");
                 }
-                $ref  = new \ReflectionFunction($argument);
+                $ref  = new \ReflectionFunction($class_name);
                 $args = $ref->getNumberOfParameters();
                 if ($args<1) {
-                    throw new \PDOException("Function $argument can't receive parameters");
+                    throw new \PDOException("Function $class_name can't receive parameters");
                 }
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
                 foreach ($rst as $value) {
@@ -306,7 +306,7 @@ class PDOOCIStatement implements \Iterator
                     foreach ($value as $key => $data) {
                         array_push($temp, $data);
                     }
-                    call_user_func_array($argument, $temp);
+                    call_user_func_array($class_name, $temp);
                 }
                 break;
             }
@@ -332,15 +332,16 @@ class PDOOCIStatement implements \Iterator
     /**
      * Fetch data and create an object
      *
-     * @param string $name class name
+     * @param string $class_name
+     * @param null   $ctor_args
      *
-     * @return mixed object
+     * @return mixed|null|\stdClass
      */
-    public function fetchObject($name='stdClass')
+    public function fetchObject($class_name='stdClass', $ctor_args=null)
     {
         try {
             $data = $this->fetch(\PDO::FETCH_ASSOC);
-            return $this->_createObjectFromData($name, $data);
+            return $this->_createObjectFromData($class_name, $data);
         } catch (\Exception $e) {
             return null;
         }
