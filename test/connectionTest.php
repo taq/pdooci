@@ -10,7 +10,6 @@
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-require_once "../pdooci.php";
 
 /**
  * Testing connection
@@ -32,7 +31,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
      *
      * @return null
      */
-    public function setUp() 
+    public function setUp()
     {
         $user = getenv("PDOOCI_user");
         $pwd  = getenv("PDOOCI_pwd");
@@ -45,7 +44,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
      *
      * @return null
      */
-    public function testObject() 
+    public function testObject()
     {
         $this->assertNotNull(self::$con);
     }
@@ -142,7 +141,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    /** 
+    /**
      * Test if OCI is present on the available drivers
      *
      * @return null
@@ -200,4 +199,4 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_numeric($id));
     }
 }
-?>
+

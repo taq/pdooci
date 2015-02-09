@@ -10,8 +10,6 @@
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-require_once "../pdooci.php";
-require_once "../statement.php";
 
 /**
  * Class for use with fetch and \PDO::FETCH_CLASS option
@@ -75,7 +73,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
      *
      * @return null
      */
-    public function setUp() 
+    public function setUp()
     {
         $user = getenv("PDOOCI_user");
         $pwd  = getenv("PDOOCI_pwd");
@@ -473,7 +471,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
     /**
      * Prepare a statement without values
      *
-     * @return PDOOCIStatement statement
+     * @return \PDOOCI\PDOOCIStatement statement
      */
     public function testPreparedWithoutValues()
     {
@@ -494,7 +492,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
     /**
      * Prepare a statement with numeric index based values
      *
-     * @return PDOOCIStatement statement
+     * @return \PDOOCI\PDOOCIStatement statement
      */
     public function testPreparedWithNumericIndexes()
     {
@@ -518,7 +516,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
     /**
      * Prepare a statement with named based values
      *
-     * @return PDOOCIStatement statement
+     * @return \PDOOCI\PDOOCIStatement statement
      */
     public function testPreparedWithNamedIndexes()
     {
@@ -542,7 +540,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
      * Prepare a crazy statement with indexes and named based values
      * What stupid crazy maniac will make something like that?
      *
-     * @return PDOOCIStatement statement
+     * @return \PDOOCI\PDOOCIStatement statement
      */
     public function testPreparedWithCrazyIndexes()
     {
@@ -563,7 +561,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($email, $data["EMAIL"]);
     }
 
-    /** 
+    /**
      * Return results on a foreach loop
      *
      * @return null
@@ -799,7 +797,7 @@ END;
      *
      * @param mixed $values optional values
      *
-     * @return PDOOCIStatement statement
+     * @return \PDOOCI\PDOOCIStatement statement
      */
     private function _insertValue($values=null)
     {
@@ -816,7 +814,7 @@ END;
     /**
      * Delete a row
      *
-     * @return PDOOCIStatement statement
+     * @return \PDOOCI\PDOOCIStatement statement
      */
     private function _deleteValue()
     {
@@ -826,7 +824,7 @@ END;
     /**
      * Insert a row with exec()
      *
-     * @return PDOOCIStatement statement
+     * @return \PDOOCI\PDOOCIStatement statement
      */
     private function _insertValueWithExec()
     {
@@ -836,7 +834,7 @@ END;
     /**
      * Delete a row with exec()
      *
-     * @return PDOOCIStatement statement
+     * @return \PDOOCI\PDOOCIStatement statement
      */
     private function _deleteValueWithExec()
     {
@@ -849,7 +847,7 @@ END;
      * @param array $expected keys expected
      * @param array $found    keys found
      *
-     * @return all keys ok
+     * @return bool all keys ok
      */
     private function _checkKeys($expected, $found)
     {

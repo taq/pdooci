@@ -85,13 +85,12 @@ class PDOOCIStatement extends \PDOStatement
     /**
      * Binds a param
      *
-     * @param mixed $param  param (column)
-     * @param mixed &$value value for param
-     * @param mixed $type   optional data type
-     * @param mixed $leng   optional length
-     *
-     * @return bool bound
-     * @throws \PDOException
+     * @param mixed $paramno
+     * @param mixed $param
+     * @param null $type
+     * @param null $maxlen
+     * @param null $driverdata
+     * @return bool
      */
     public function bindParam($paramno, &$param, $type=null, $maxlen=null, $driverdata=null)
     {
@@ -214,19 +213,19 @@ class PDOOCIStatement extends \PDOStatement
 
             switch ($style)
             {
-            case \PDO::FETCH_BOTH:
-            case \PDO::FETCH_BOUND:
-                $rst = \oci_fetch_array($this->_stmt, \OCI_BOTH + \OCI_RETURN_NULLS);
-                break;
-            case \PDO::FETCH_ASSOC:
-                $rst = \oci_fetch_array($this->_stmt, \OCI_ASSOC + \OCI_RETURN_NULLS);
-                break;
-            case \PDO::FETCH_NUM:
-                $rst = \oci_fetch_array($this->_stmt, \OCI_NUM + OCI_RETURN_NULLS);
-                break;
-            case \PDO::FETCH_OBJ:
-                $rst = \oci_fetch_object($this->_stmt);
-                break;
+                case \PDO::FETCH_BOTH:
+                case \PDO::FETCH_BOUND:
+                    $rst = \oci_fetch_array($this->_stmt, \OCI_BOTH + \OCI_RETURN_NULLS);
+                    break;
+                case \PDO::FETCH_ASSOC:
+                    $rst = \oci_fetch_array($this->_stmt, \OCI_ASSOC + \OCI_RETURN_NULLS);
+                    break;
+                case \PDO::FETCH_NUM:
+                    $rst = \oci_fetch_array($this->_stmt, \OCI_NUM + OCI_RETURN_NULLS);
+                    break;
+                case \PDO::FETCH_OBJ:
+                    $rst = \oci_fetch_object($this->_stmt);
+                    break;
             }
             $this->_current = $rst;
             $this->_checkBinds();
@@ -253,62 +252,62 @@ class PDOOCIStatement extends \PDOStatement
         try {
             switch ($style)
             {
-            case \PDO::FETCH_ASSOC:
-                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
-                break;
+                case \PDO::FETCH_ASSOC:
+                    \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
+                    break;
 
-            case \PDO::FETCH_BOTH:
-                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM + \OCI_ASSOC);
-                break;
+                case \PDO::FETCH_BOTH:
+                    \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM + \OCI_ASSOC);
+                    break;
 
-            case \PDO::FETCH_COLUMN:
-                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
-                $rst = array_map(
-                    function ($vals) use ($class_name) {
-                        return $vals[intval($class_name)];
-                    }, $rst
-                );
-                break;
+                case \PDO::FETCH_COLUMN:
+                    \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
+                    $rst = array_map(
+                        function ($vals) use ($class_name) {
+                            return $vals[intval($class_name)];
+                        }, $rst
+                    );
+                    break;
 
-            case \PDO::FETCH_COLUMN|\PDO::FETCH_GROUP:
-                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
-                $temp = array();
-                foreach ($rst as $value) {
-                    if (!array_key_exists($value[0], $temp)) {
-                        $temp[$value[0]] = array();
-                    }
-                    array_push($temp[$value[0]], $value[1]);
-                }
-                $rst = $temp;
-                break;
-
-            case \PDO::FETCH_CLASS:
-                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
-                $temp = array();
-                foreach ($rst as $data) {
-                    array_push($temp, $this->_createObjectFromData($class_name, $data));
-                }
-                $rst  = $temp;
-                break;
-
-            case \PDO::FETCH_FUNC:
-                if (!function_exists($class_name)) {
-                    throw new \PDOException("Function $class_name does not exists");
-                }
-                $ref  = new \ReflectionFunction($class_name);
-                $args = $ref->getNumberOfParameters();
-                if ($args<1) {
-                    throw new \PDOException("Function $class_name can't receive parameters");
-                }
-                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
-                foreach ($rst as $value) {
+                case \PDO::FETCH_COLUMN|\PDO::FETCH_GROUP:
+                    \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
                     $temp = array();
-                    foreach ($value as $key => $data) {
-                        array_push($temp, $data);
+                    foreach ($rst as $value) {
+                        if (!array_key_exists($value[0], $temp)) {
+                            $temp[$value[0]] = array();
+                        }
+                        array_push($temp[$value[0]], $value[1]);
                     }
-                    call_user_func_array($class_name, $temp);
-                }
-                break;
+                    $rst = $temp;
+                    break;
+
+                case \PDO::FETCH_CLASS:
+                    \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
+                    $temp = array();
+                    foreach ($rst as $data) {
+                        array_push($temp, $this->_createObjectFromData($class_name, $data));
+                    }
+                    $rst  = $temp;
+                    break;
+
+                case \PDO::FETCH_FUNC:
+                    if (!function_exists($class_name)) {
+                        throw new \PDOException("Function $class_name does not exists");
+                    }
+                    $ref  = new \ReflectionFunction($class_name);
+                    $args = $ref->getNumberOfParameters();
+                    if ($args<1) {
+                        throw new \PDOException("Function $class_name can't receive parameters");
+                    }
+                    \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
+                    foreach ($rst as $value) {
+                        $temp = array();
+                        foreach ($value as $key => $data) {
+                            array_push($temp, $data);
+                        }
+                        call_user_func_array($class_name, $temp);
+                    }
+                    break;
             }
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());

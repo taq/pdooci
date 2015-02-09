@@ -38,7 +38,6 @@ class PDO extends \PDO
      * @param string $password password
      * @param string $options  options to send to the connection
      *
-     * @return \PDO object
      * @throws \PDOException
      */
     public function __construct($data, $username, $password, $options=null)
@@ -68,7 +67,6 @@ class PDO extends \PDO
         } catch (\Exception $exception) {
             throw new \PDOException($exception->getMessage());
         }
-        return $this;
     }
 
     /**
@@ -98,8 +96,8 @@ class PDO extends \PDO
         $expr   = '/^(charset=)(\w+)$/';
         $tokens = array_filter(
             $charset, function ($token) use ($expr) {
-                return preg_match($expr, $token, $matches);
-            }
+            return preg_match($expr, $token, $matches);
+        }
         );
         if (sizeof($tokens)>0) {
             preg_match($expr, array_shift($tokens), $matches);
@@ -177,9 +175,9 @@ class PDO extends \PDO
     {
         switch($attr)
         {
-        case \PDO::ATTR_AUTOCOMMIT:
-            $this->_autocommit = (is_bool($value) && $value) || in_array(strtolower($value), array("on", "true"));
-            return;
+            case \PDO::ATTR_AUTOCOMMIT:
+                $this->_autocommit = (is_bool($value) && $value) || in_array(strtolower($value), array("on", "true"));
+                return;
         }
     }
 
@@ -194,10 +192,10 @@ class PDO extends \PDO
     {
         switch($attr)
         {
-        case \PDO::ATTR_AUTOCOMMIT:
-            return $this->_autocommit;
-        case \PDO::ATTR_DRIVER_NAME:
-            return 'oci';
+            case \PDO::ATTR_AUTOCOMMIT:
+                return $this->_autocommit;
+            case \PDO::ATTR_DRIVER_NAME:
+                return 'oci';
         }
         return null;
     }
