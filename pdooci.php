@@ -14,7 +14,7 @@ namespace PDOOCI;
 require_once dirname(__FILE__)."/statement.php";
 
 /**
- * Main class of PDOCI
+ * Main class of PDOOCI
  *
  * PHP version 5.3
  *
@@ -39,7 +39,8 @@ class PDO extends \PDO
      * @param string $password password
      * @param string $options  options to send to the connection
      *
-     * @return PDO object
+     * @return \PDO object
+     * @throws \PDOException
      */
     public function __construct($data, $username, $password, $options=null)
     {
@@ -74,7 +75,7 @@ class PDO extends \PDO
     /**
      * Return the charset
      *
-     * @return mixed charset
+     * @return string charset
      */
     public function getCharset()
     {
@@ -113,7 +114,7 @@ class PDO extends \PDO
     /**
      * Return the connection
      *
-     * @return connection handle
+     * @return resource handle
      */
     public function getConnection()
     {
@@ -129,6 +130,7 @@ class PDO extends \PDO
      * @param int    $p2        PDO query() second parameter
      *
      * @return PDOOCIStatement
+     * @throws \PDOException
      */
     public function query($statement, $mode=null, $p1=null, $p2=null)
     {
@@ -139,7 +141,7 @@ class PDO extends \PDO
             $stmt->execute();
             $this->setError();
             return $stmt;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         return $stmt;
@@ -151,6 +153,7 @@ class PDO extends \PDO
      * @param string $sql query
      *
      * @return number of affected rows
+     * @throws \PDOException
      */
     public function exec($sql)
     {
@@ -159,7 +162,7 @@ class PDO extends \PDO
             $rows = $stmt->rowCount();
             $stmt->closeCursor();
             return $rows;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         return $this;
@@ -251,13 +254,14 @@ class PDO extends \PDO
      * @param mixed  $options for driver
      *
      * @return PDOOCIStatement
+     * @throws \PDOException
      */
     public function prepare($query, $options=null)
     {
         $stmt = null;
         try {
             $stmt = new PDOOCIStatement($this, $query);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
         return $stmt;
@@ -392,6 +396,7 @@ class PDO extends \PDO
      * @param string $sequence name
      *
      * @return mixed last id
+     * @throws \PDOException
      */
     public function lastInsertId($sequence=null)
     {
@@ -404,6 +409,7 @@ class PDO extends \PDO
             $data = $stmt->fetch(\PDO::FETCH_ASSOC);
             $id   = intval($data["CURRVAL"]);
         } catch (\PDOException $e) {
+            $id   = -1;
         }
         return $id;
     }
