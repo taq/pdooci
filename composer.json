@@ -5,6 +5,7 @@
     "keywords": ["oracle","oci","pdo","pdo_oci"],
     "homepage": "http://github.com/taq/pdooci",
     "license": "GPL",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "Eustaquio Rangel",
