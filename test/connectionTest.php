@@ -32,7 +32,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
      *
      * @return null
      */
-    public function setUp() 
+    public function setUp()
     {
         $user = getenv("PDOOCI_user");
         $pwd  = getenv("PDOOCI_pwd");
@@ -45,7 +45,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
      *
      * @return null
      */
-    public function testObject() 
+    public function testObject()
     {
         $this->assertNotNull(self::$con);
     }

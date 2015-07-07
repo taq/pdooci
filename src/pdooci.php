@@ -50,6 +50,7 @@ class PDO extends \PDO
 
         // find charset
         $charset = null;
+        $data    = preg_replace('/^oci:/', '', $data);
         $tokens  = preg_split('/;/', $data);
         $data    = $tokens[0];
         $charset = $this->_getCharset($tokens);

@@ -13,7 +13,7 @@
 namespace PDOOCI;
 
 /**
- * State,emt class of PDOOCI
+ * Statememt class of PDOOCI
  *
  * PHP version 5.3
  *
