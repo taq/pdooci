@@ -11,7 +11,7 @@
  * @link     http://github.com/taq/pdooci
  */
 namespace PDOOCI;
-require_once dirname(__FILE__)."/statement.php";
+require_once dirname(__FILE__)."/Statement.php";
 
 /**
  * Main class of PDOOCI
@@ -130,7 +130,7 @@ class PDO extends \PDO
      * @param int    $p1        PDO query() first parameter
      * @param int    $p2        PDO query() second parameter
      *
-     * @return PDOOCIStatement
+     * @return Statement
      * @throws \PDOException
      */
     public function query($statement, $mode=null, $p1=null, $p2=null)
@@ -138,7 +138,7 @@ class PDO extends \PDO
         // TODO: use mode and parameters
         $stmt = null;
         try {
-            $stmt = new PDOOCIStatement($this, $statement);
+            $stmt = new Statement($this, $statement);
             $stmt->execute();
             $this->setError();
             return $stmt;
@@ -254,14 +254,14 @@ class PDO extends \PDO
      * @param string $query   for statement
      * @param mixed  $options for driver
      *
-     * @return PDOOCIStatement
+     * @return Statement
      * @throws \PDOException
      */
     public function prepare($query, $options=null)
     {
         $stmt = null;
         try {
-            $stmt = new PDOOCIStatement($this, $query);
+            $stmt = new Statement($this, $query);
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }

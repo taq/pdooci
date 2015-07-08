@@ -23,7 +23,7 @@ namespace PDOOCI;
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-class PDOOCIStatement implements \Iterator
+class Statement implements \Iterator
 {
     private $_pdooci    = null;
     private $_con       = null;
@@ -41,14 +41,14 @@ class PDOOCIStatement implements \Iterator
      * @param resource $pdooci    PDOOCI connection
      * @param string   $statement sql statement
      *
-     * @return PDOOCIStatement $statement created
+     * @return Statement $statement created
      */
     public function __construct($pdooci, $statement)
     {
         try {
             $this->_pdooci    = $pdooci;
             $this->_con       = $pdooci->getConnection();
-            $this->_statement = PDOOCIStatement::insertMarks($statement);
+            $this->_statement = Statement::insertMarks($statement);
             $this->_stmt      = \oci_parse($this->_con, $this->_statement);
             $this->_fetch_sty = \PDO::FETCH_BOTH;
 

@@ -10,8 +10,8 @@
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-require_once "../pdooci.php";
-require_once "../statement.php";
+require_once "../src/PDO.php";
+require_once "../src/Statement.php";
 
 /**
  * Class for use with fetch and \PDO::FETCH_CLASS option
@@ -456,7 +456,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
     {
         $sql = "insert into people (name,email) values (?,?)";
         $converted = "insert into people (name,email) values (:pdooci_m0,:pdooci_m1)";
-        $this->assertEquals($converted, PDOOCI\PDOOCIStatement::insertMarks($sql));
+        $this->assertEquals($converted, PDOOCI\Statement::insertMarks($sql));
     }
 
     /**
@@ -467,13 +467,13 @@ class StatementTest extends PHPUnit_Framework_TestCase
     public function testDontCreateMarks()
     {
         $sql = "insert into people (name,email) values (:name,:email)";
-        $this->assertEquals($sql, PDOOCI\PDOOCIStatement::insertMarks($sql));
+        $this->assertEquals($sql, PDOOCI\Statement::insertMarks($sql));
     }
 
     /**
      * Prepare a statement without values
      *
-     * @return PDOOCIStatement statement
+     * @return Statement statement
      */
     public function testPreparedWithoutValues()
     {
@@ -494,7 +494,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
     /**
      * Prepare a statement with numeric index based values
      *
-     * @return PDOOCIStatement statement
+     * @return Statement statement
      */
     public function testPreparedWithNumericIndexes()
     {
@@ -518,7 +518,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
     /**
      * Prepare a statement with named based values
      *
-     * @return PDOOCIStatement statement
+     * @return Statement statement
      */
     public function testPreparedWithNamedIndexes()
     {
@@ -542,7 +542,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
      * Prepare a crazy statement with indexes and named based values
      * What stupid crazy maniac will make something like that?
      *
-     * @return PDOOCIStatement statement
+     * @return Statement statement
      */
     public function testPreparedWithCrazyIndexes()
     {
@@ -799,7 +799,7 @@ END;
      *
      * @param mixed $values optional values
      *
-     * @return PDOOCIStatement statement
+     * @return Statement statement
      */
     private function _insertValue($values=null)
     {
@@ -816,7 +816,7 @@ END;
     /**
      * Delete a row
      *
-     * @return PDOOCIStatement statement
+     * @return Statement statement
      */
     private function _deleteValue()
     {
@@ -826,7 +826,7 @@ END;
     /**
      * Insert a row with exec()
      *
-     * @return PDOOCIStatement statement
+     * @return Statement statement
      */
     private function _insertValueWithExec()
     {
@@ -836,7 +836,7 @@ END;
     /**
      * Delete a row with exec()
      *
-     * @return PDOOCIStatement statement
+     * @return Statement statement
      */
     private function _deleteValueWithExec()
     {

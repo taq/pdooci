@@ -10,7 +10,7 @@
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-require_once "../pdooci.php";
+require_once "../src/PDO.php";
 
 /**
  * Testing connection
