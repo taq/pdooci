@@ -23,7 +23,7 @@ namespace PDOOCI;
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-class Statement implements \Iterator
+class Statement extends \PDOStatement implements \IteratorAggregate
 {
     private $_pdooci    = null;
     private $_con       = null;
@@ -396,67 +396,10 @@ class Statement implements \Iterator
     {
         return $this->_statement;
     }
-
-    /**
-     * Return the current value
-     *
-     * @return null
-     */
-    public function current()
+    
+    public function getIterator()
     {
-        if (!$this->_current) {
-            $this->next();
-            if (!$this->_current) {
-                $this->_pos = -1;
-                $this->closeCursor();
-            }
-        }
-        return $this->_current;
-    }
-
-    /**
-     * Return the current key/position
-     *
-     * @return null
-     */
-    public function key()
-    {
-        return $this->_pos;
-    }
-
-    /**
-     * Return the next value
-     *
-     * @return null
-     */
-    public function next()
-    {
-        $this->_current = $this->fetch(\PDO::FETCH_ASSOC);
-        if (!$this->_current) {
-            $this->_pos = -1;
-        }
-        $this->_checkBinds();
-    }
-
-    /**
-     * Rewind
-     *
-     * @return null
-     */
-    public function rewind()
-    {
-        $this->_pos = 0;
-    }
-
-    /**
-     * Check if the current value is valid
-     *
-     * @return null
-     */
-    public function valid()
-    {
-        $valid = $this->_pos >= 0;
-        return $valid;
+        return new StatementIterator($this);
     }
 
     /**
