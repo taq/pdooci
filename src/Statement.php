@@ -33,7 +33,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     private $_current   = null;
     private $_pos       = 0;
     private $_binds     = array();
-    public  $queryString= "";
+    public $queryString= "";
 
     /**
      * Constructor
@@ -51,8 +51,6 @@ class Statement extends \PDOStatement implements \IteratorAggregate
             $this->_statement = Statement::insertMarks($statement);
             $this->_stmt      = \oci_parse($this->_con, $this->_statement);
             $this->_fetch_sty = \PDO::FETCH_BOTH;
-
-            $this->queryString = $this->_statement;
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
