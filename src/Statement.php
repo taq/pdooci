@@ -13,7 +13,7 @@
 namespace PDOOCI;
 
 /**
- * Statememt class of PDOOCI
+ * Statement class of PDOOCI
  *
  * PHP version 5.3
  *
@@ -33,7 +33,6 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     private $_current   = null;
     private $_pos       = 0;
     private $_binds     = array();
-    public $queryString= "";
 
     /**
      * Constructor
@@ -81,10 +80,10 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     /**
      * Binds a param
      *
-     * @param mixed $param  param (column)
-     * @param mixed &$value value for param
-     * @param mixed $type   optional data type
-     * @param mixed $leng   optional length
+     * @param mixed $param param (column)
+     * @param mixed $value value for param
+     * @param mixed $type  optional data type
+     * @param mixed $leng  optional length
      *
      * @return bool bound
      */
@@ -395,6 +394,11 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         return $this->_statement;
     }
     
+    /**
+     * Return the iterator
+     *
+     * @return mixed iterator
+     */
     public function getIterator()
     {
         return new StatementIterator($this);
@@ -428,7 +432,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
      * Bind column
      *
      * @param mixed $column as index (1-based) or name
-     * @param mixed &$param variable
+     * @param mixed $param  variable
      * @param int   $type   type
      * @param int   $maxlen max length
      * @param mixed $driver data

@@ -10,8 +10,7 @@
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-require_once "../src/PDO.php";
-require_once "../src/Statement.php";
+require_once "../vendor/autoload.php";
 
 /**
  * Class for use with fetch and \PDO::FETCH_CLASS option

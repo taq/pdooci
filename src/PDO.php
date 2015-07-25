@@ -12,6 +12,7 @@
  */
 namespace PDOOCI;
 require_once dirname(__FILE__)."/Statement.php";
+require_once dirname(__FILE__)."/StatementIterator.php";
 
 /**
  * Main class of PDOOCI

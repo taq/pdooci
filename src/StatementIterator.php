@@ -1,21 +1,46 @@
 <?php
-
+/**
+ * PDOCI
+ *
+ * PHP version 5.3
+ *
+ * @category Iterator
+ * @package  PDOOCI
+ * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
+ * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
+ * @link     http://github.com/taq/pdooci
+ */
 namespace PDOOCI;
 
+/**
+ * Statement class of PDOOCI
+ *
+ * PHP version 5.3
+ *
+ * @category Statement
+ * @package  PDOOCI
+ * @author   Eustáquio Rangel <eustaquiorangel@gmail.com>
+ * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
+ * @link     http://github.com/taq/pdooci
+ */
 
 class StatementIterator implements \Iterator
 {
     /**
+     * Data array
+     *
      * @var array
      */
-    private $data;
+    private $_data;
 
     /**
-     * @param Statement $statement
+     * Constructor
+     *
+     * @param mixed $statement statement
      */
-    public function __construct (Statement $statement)
+    public function __construct(Statement $statement)
     {
-        $this->data = $statement->fetchAll();
+        $this->_data = $statement->fetchAll();
     }
 
     /**
@@ -27,7 +52,7 @@ class StatementIterator implements \Iterator
      */
     public function current ()
     {
-        return current($this->data);
+        return current($this->_data);
     }
 
     /**
@@ -39,7 +64,7 @@ class StatementIterator implements \Iterator
      */
     public function next ()
     {
-        next($this->data);
+        next($this->_data);
     }
 
     /**
@@ -51,21 +76,21 @@ class StatementIterator implements \Iterator
      */
     public function key ()
     {
-        return key($this->data);
+        return key($this->_data);
     }
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Checks if current position is valid
+     * Returns true on success or false on failure.
      *
      * @link http://php.net/manual/en/iterator.valid.php
      * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
      */
     public function valid ()
     {
-        $k = key($this->data);
-        return isset($this->data[$k]);
+        $k = key($this->_data);
+        return isset($this->_data[$k]);
     }
 
     /**
@@ -77,6 +102,6 @@ class StatementIterator implements \Iterator
      */
     public function rewind ()
     {
-        reset($this->data);
+        reset($this->_data);
     }
 }
