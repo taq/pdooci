@@ -80,14 +80,15 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     /**
      * Binds a param
      *
-     * @param mixed $param param (column)
-     * @param mixed $value value for param
-     * @param mixed $type  optional data type
-     * @param mixed $leng  optional length
+     * @param mixed $param  param (column)
+     * @param mixed $value  value for param
+     * @param mixed $type   optional data type
+     * @param mixed $leng   optional length
+     * @param mixed $driver driver data
      *
      * @return bool bound
      */
-    public function bindParam($param, &$value, $type=null, $leng=null)
+    public function bindParam($param, &$value, $type=null, $leng=null, $driver=null)
     {
         $ok = false;
         try {
@@ -197,12 +198,14 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     /**
      * Fetch a value
      *
-     * @param int $style to fetch values
+     * @param int $style       to fetch values
+     * @param int $orientation cursor orientation
+     * @param int $offset      offset
      *
      * @return mixed
      * @throws \PDOException
      */
-    public function fetch($style=null)
+    public function fetch($style = null, $orientation = null, $offset = null)
     {
         set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
@@ -238,12 +241,13 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     /**
      * Fetch all
      *
-     * @param mixed $style    fetch style
-     * @param mixed $argument fetch argument
+     * @param mixed $style     fetch style
+     * @param mixed $argument  fetch argument
+     * @param mixed $ctor_args constructor args
      *
      * @return mixed results
      */
-    public function fetchAll($style=null, $argument=null)
+    public function fetchAll($style=null, $argument=null, $ctor_args=null)
     {
         $style = is_null($style) ? \PDO::FETCH_BOTH : $style;
         $rst   = null;
@@ -329,11 +333,12 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     /**
      * Fetch data and create an object
      *
-     * @param string $name class name
+     * @param string $name      class name
+     * @param mixed  $ctor_args constructor args
      *
      * @return mixed object
      */
-    public function fetchObject($name='stdClass')
+    public function fetchObject($name='stdClass', $ctor_args=null)
     {
         try {
             $data = $this->fetch(\PDO::FETCH_ASSOC);
