@@ -92,7 +92,11 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         $ok = false;
         try {
             $param = $this->_getBindVar($param);
-            $ok    = \oci_bind_by_name($this->_stmt, $param, $value);
+            if ($type && $leng) {
+                $ok = \oci_bind_by_name($this->_stmt, $param, $value, $leng, $type);
+            } else {
+                $ok = \oci_bind_by_name($this->_stmt, $param, $value);
+            }
             $this->_binds[$param] = $value;
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
