@@ -71,15 +71,14 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         try {
             $param = $this->_getBindVar($param);
             if (PDO::PARAM_LOB == $type) {
-                $lob = oci_new_descriptor($this->_con, OCI_D_LOB);
-                $ok  = oci_bind_by_name($this->_stmt, $param, $lob, -1, OCI_B_BLOB);
+                $lob = \oci_new_descriptor($this->_con, \OCI_D_LOB);
+                $ok  = \oci_bind_by_name($this->_stmt, $param, $lob, -1, \OCI_B_BLOB);
                 $this->_bindsLob[$param] = array(
                     'lob'   => $lob,
                     'value' => $value,
                 );
-            }
-            else {
-                $ok    = \oci_bind_by_name($this->_stmt, $param, $value);
+            } else {
+                $ok = \oci_bind_by_name($this->_stmt, $param, $value);
                 $this->_binds[$param] = $value;
             }
         } catch (\Exception $e) {
@@ -162,8 +161,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                 $this->_pdooci->setError($this->_stmt);
                 $error = $this->_pdooci->errorInfo();
                 throw new \PDOException($error[2]);
-            }
-            else {
+            } else {
                 if (count($this->_bindsLob)) {
                     foreach ($this->_bindsLob as $param => $bind) {
                         $ok = $bind['lob']->save($bind['value']);
