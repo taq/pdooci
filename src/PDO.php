@@ -53,7 +53,7 @@ class PDO extends \PDO
         $charset = null;
         $data    = preg_replace('/^oci:/', '', $data);
         $tokens  = preg_split('/;/', $data);
-        $data    = $tokens[0];
+        $data    = str_replace(array('dbname=//', 'dbname='), '', $tokens[0]);
         $charset = $this->_getCharset($tokens);
 
         try {
