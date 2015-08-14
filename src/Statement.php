@@ -34,6 +34,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     private $_pos       = 0;
     private $_binds     = array();
     private $_bindsLob  = array();
+    private $_case      = null;
 
     /**
      * Constructor
@@ -51,6 +52,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
             $this->_statement = Statement::insertMarks($statement);
             $this->_stmt      = \oci_parse($this->_con, $this->_statement);
             $this->_fetch_sty = \PDO::FETCH_BOTH;
+            $this->_case      = $pdooci->getAttribute(\PDO::ATTR_CASE);
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -241,6 +243,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                 break;
             case \PDO::FETCH_ASSOC:
                 $rst = \oci_fetch_array($this->_stmt, \OCI_ASSOC + \OCI_RETURN_NULLS);
+                $rst = $this->_fixResultKeys($rst);
                 break;
             case \PDO::FETCH_NUM:
                 $rst = \oci_fetch_array($this->_stmt, \OCI_NUM + OCI_RETURN_NULLS);
@@ -604,6 +607,28 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     public function nextRowSet()
     {
         // TODO: insert some code here if needed
+    }
+
+    protected function _fixResultKeys($result)
+    {
+        if(!$this->_case || $this->_case === \PDO::CASE_NATURAL)
+            return $result;
+        switch($this->_case)
+        {
+            case \PDO::CASE_LOWER:
+                $case = CASE_LOWER;
+                break;
+            case \PDO::CASE_UPPER:
+                $case = CASE_UPPER;
+                break;
+            default:
+                throw new \PDOException('Unknown case attribute: '.$this->_case);
+        }
+        if(is_array($result))
+        {
+            $result = array_change_key_case($result, $case);
+        }
+        return $result;
     }
 }
 ?>

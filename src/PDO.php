@@ -31,6 +31,7 @@ class PDO extends \PDO
     private $_autocommit = true;
     private $_last_error = null;
     private $_charset    = null;
+    private $_case       = \PDO::CASE_NATURAL;
 
     /**
      * Class constructor
@@ -185,6 +186,9 @@ class PDO extends \PDO
         case \PDO::ATTR_AUTOCOMMIT:
             $this->_autocommit = (is_bool($value) && $value) || in_array(strtolower($value), array("on", "true"));
             return;
+        case \PDO::ATTR_CASE:
+            $this->_case = $value;
+            return;
         }
     }
 
@@ -203,6 +207,8 @@ class PDO extends \PDO
             return $this->_autocommit;
         case \PDO::ATTR_DRIVER_NAME:
             return 'oci';
+        case \PDO::ATTR_CASE:
+            return $this->_case;
         }
         return null;
     }
