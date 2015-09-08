@@ -278,6 +278,10 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
                 break;
 
+            case \PDO::FETCH_NUM:
+                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
+                break;
+
             case \PDO::FETCH_BOTH:
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM + \OCI_ASSOC);
                 break;
