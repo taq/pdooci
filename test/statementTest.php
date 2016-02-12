@@ -459,6 +459,26 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Convert a query to use bind marks, only when not inside quotes
+     *
+     * @return String query
+     */
+    public function testCreateMarksNoQuotes()
+    {
+        $sql = "insert into people (name,email,key) values (?,?,'abc?')";
+        $converted = "insert into people (name,email,key) values (:pdooci_m0,:pdooci_m1,'abc?')";
+        $this->assertEquals($converted, PDOOCI\Statement::insertMarks($sql));
+
+        $sql = "insert into people (name,email,key) values (?,?,'?abc')";
+        $converted = "insert into people (name,email,key) values (:pdooci_m0,:pdooci_m1,'?abc')";
+        $this->assertEquals($converted, PDOOCI\Statement::insertMarks($sql));
+
+        $sql = "insert into people (name,email,key) values (?,?,'?abc?')";
+        $converted = "insert into people (name,email,key) values (:pdooci_m0,:pdooci_m1,'?abc?')";
+        $this->assertEquals($converted, PDOOCI\Statement::insertMarks($sql));
+    }
+
+    /**
      * Don't change the query if is not needed
      *
      * @return String query

@@ -403,14 +403,9 @@ class Statement extends \PDOStatement implements \IteratorAggregate
      */
     public static function insertMarks($query)
     {
-        preg_match_all('/\?/', $query, $marks);
-        if (sizeof($marks[0])<1) {
-            return $query;
-        }
-        foreach ($marks[0] as $idx => $mark) {
-            $query = preg_replace("/\?/", ":pdooci_m$idx", $query, 1);
-        }
-        return $query;
+        $pos   = -1;
+        $regex = '/(?<!\')\?(?!\')/';
+        return preg_replace_callback($regex, function($matches) use (&$pos) { $pos++; return ":pdooci_m$pos"; }, $query);
     }
 
     /**
