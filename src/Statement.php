@@ -229,7 +229,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     {
         set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
-            $style = !$style ? $this->_fetch_sty : $style;
+            $style = is_null($style) ? $this->_fetch_sty : $style;
             $this->_fetch_sty = $style;
             $rst   = null;
 
@@ -243,7 +243,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                 $rst = \oci_fetch_array($this->_stmt, \OCI_ASSOC + \OCI_RETURN_NULLS);
                 break;
             case \PDO::FETCH_NUM:
-                $rst = \oci_fetch_array($this->_stmt, \OCI_NUM + OCI_RETURN_NULLS);
+                $rst = \oci_fetch_array($this->_stmt, \OCI_NUM + \OCI_RETURN_NULLS);
                 break;
             case \PDO::FETCH_OBJ:
                 $rst = \oci_fetch_object($this->_stmt);
@@ -269,7 +269,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
      */
     public function fetchAll($style=null, $argument=null, $ctor_args=null)
     {
-        $style = is_null($style) ? \PDO::FETCH_BOTH : $style;
+        $style = is_null($style) ? $this->_fetch_sty : $style;
         $rst   = null;
         try {
             switch ($style)
