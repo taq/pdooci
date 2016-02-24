@@ -75,7 +75,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                 $ok  = \oci_bind_by_name($this->_stmt, $param, $lob, -1, \OCI_B_BLOB);
                 $this->_bindsLob[$param] = array(
                     'lob'   => $lob,
-                    'value' => $value,
+                    'value' => stream_get_contents($value),
                 );
             } else {
                 $ok = \oci_bind_by_name($this->_stmt, $param, $value);
@@ -169,6 +169,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                             $error = $this->_pdooci->errorInfo();
                             throw new \PDOException($error[2]);
                         }
+                        $bind['lob']->free();
                     }
                 }
             }
@@ -276,6 +277,10 @@ class Statement extends \PDOStatement implements \IteratorAggregate
             {
             case \PDO::FETCH_ASSOC:
                 \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_ASSOC);
+                break;
+
+            case \PDO::FETCH_NUM:
+                \oci_fetch_all($this->_stmt, $rst, 0, -1, \OCI_FETCHSTATEMENT_BY_ROW + \OCI_NUM);
                 break;
 
             case \PDO::FETCH_BOTH:

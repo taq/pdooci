@@ -224,8 +224,10 @@ class PDO extends \PDO
      */
     public function commit()
     {
-        \oci_commit($this->_con);
+        $ok = \oci_commit($this->_con);
         $this->setError();
+        $this->setAttribute(\PDO::ATTR_AUTOCOMMIT, true);
+        return $ok;
     }
 
     /**
@@ -235,8 +237,10 @@ class PDO extends \PDO
      */
     public function rollBack()
     {
-        \oci_rollback($this->_con);
+        $ok = \oci_rollback($this->_con);
         $this->setError();
+        $this->setAttribute(\PDO::ATTR_AUTOCOMMIT, true);
+        return $ok;
     }
 
     /**
