@@ -1,5 +1,4 @@
-PDOCI
-=====
+# PDOCI
 
 Wrapping on PHP OCI functions to simulate a PDO object, using just pure PHP and the oci_* functions.
 
@@ -18,29 +17,45 @@ with that:
 
 That's why I made `PDOOCI`.
 
-What is needed
---------------
+## Installation
 
-Just install the Oracle drivers (I like the instant client versions) and the
-`oci8` package (with `pecl`, this one seems to be updated often). Then require
-the `pdooci.php` file and change some existing code like
+First install the Oracle drivers (I like the instant client versions) and the
+`oci8` package (with `pecl`, this one seems to be updated often).
 
-```
-$pdo = new PDO("oci:dbname=mydatabase;charset=utf8", "user", "password");
-```
-
-to 
+### With Composer
 
 ```
-require_once "pdooci.php";
+$ composer require taq/pdooci
+```
+
+```json
+{
+    "require": {
+        "taq/pdooci": "^1.0"
+    }
+}
+```
+
+```php
+<?php
+require_once 'vendor/autoload.php';
+
+$pdo = new PDOOCI\PDO("mydatabase", "user", "password");
+```
+
+### Without Composer
+
+Why are you not using [composer](http://getcomposer.org/)? Download the `src` folder from the repo and rename it to `PDOOCI`, then require the `PDOOCI/PDO.php` file.
+
+```php
+require_once "PDOOCI/PDO.php";
 
 $pdo = new PDOOCI\PDO("mydatabase", "user", "password");
 ```
 
 Yeah, the rest should work exactly the same as if you were using a PDO object. :-)
 
-Testing
--------
+## Testing
 
 There is a test suite (using `PHPUnit`) on the `test` directory. If you want to
 test (you must test your code!), create a table called `people` with two
