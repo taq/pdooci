@@ -169,11 +169,15 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                         $ok = $bind['lob']->save($bind['value']);
                         if (!$ok) {
                             $error = $this->_pdooci->errorInfo();
-                            throw new \PDOException($error[2]);
+                            $e = new \PDOException($error[2], $error[1]);
+                            $e->errorInfo = $error;
+                            throw $e;
                         }
                     }
                 }
             }
+        } catch (\PDOException $e)
+            throw $e;
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
