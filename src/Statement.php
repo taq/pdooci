@@ -154,7 +154,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                     if (preg_match('/^\d+$/', $key)) {
                         $parm ++;
                     }
-                    $this->bindValue($parm, $values[$key]);
+                    $this->bindParam($parm, $values[$key]);
                     $this->_pdooci->setError();
                 }
             }
