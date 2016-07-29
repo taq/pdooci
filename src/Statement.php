@@ -176,7 +176,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                     }
                 }
             }
-        } catch (\PDOException $e)
+        } catch (\PDOException $e) {
             throw $e;
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
