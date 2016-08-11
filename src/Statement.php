@@ -145,7 +145,6 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         $ok = false;
         set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
-            $this->_pdooci->getAutoCommit();
             $auto = $this->_pdooci->getAutoCommit() ? \OCI_COMMIT_ON_SUCCESS : \OCI_NO_AUTO_COMMIT;
 
             if ($values && sizeof($values)>0) {
