@@ -340,6 +340,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
+        $rst = $this->_fixResultKeys($rst);
         return $rst;
     }
 
@@ -624,7 +625,13 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         }
         if(is_array($result))
         {
-            $result = array_change_key_case($result, $case);
+            if(is_array($result[0])){
+                for($i = 0; $i < count($result);  $i++){
+                    $result[$i] = array_change_key_case($result[$i], $case);
+                }
+            }else{
+                $result = array_change_key_case($result, $case);
+		    }
         }
         return $result;
     }
