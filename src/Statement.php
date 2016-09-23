@@ -631,7 +631,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                 }
             }else{
                 $result = array_change_key_case($result, $case);
-		    }
+            }
         }
         return $result;
     }
