@@ -166,10 +166,15 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests for case tests
+     *
+     * @param int    $case  case to convert
+     * @param string $name  user name
+     * @param string $email user email
+     *
      * @dataProvider fetchAssocWithCaseProvider
-     * @param int $case
-     * @param string $name
-     * @param string $email
+     *
+     * @return null
      */
     public function testFetchAssocWithCase($case, $name, $email)
     {
@@ -178,12 +183,17 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $stmt = self::$con->query("select * from people");
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
         $stmt->closeCursor();
-        $this->assertTrue($this->_checkKeys(array($name,$email), array_keys($data)));
+        $this->assertTrue($this->_checkKeys(array($name, $email), array_keys($data)));
         $this->assertEquals(2, sizeof($data));
         $this->assertEquals("eustaquio", $data[$name]);
         $this->assertEquals("eustaquiorangel@gmail.com", $data[$email]);
     }
 
+    /**
+     * Data provider for key case tests
+     *
+     * @return mixed array with sample tests
+     */
     public function fetchAssocWithCaseProvider()
     {
         return array(
