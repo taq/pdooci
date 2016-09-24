@@ -608,32 +608,42 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         // TODO: insert some code here if needed
     }
 
-    protected function _fixResultKeys($result)
+    /**
+     * Fix the result keys
+     *
+     * If natural, there's no need to do something. Otherwise, change to lower
+     * or upper case
+     *
+     * @param mixed $result data result
+     *
+     * @return mixed $result with the keys fixed
+     */
+    private function _fixResultKeys($result)
     {
-        if(!$this->_case || $this->_case === \PDO::CASE_NATURAL)
+        if (!$this->_case || $this->_case === \PDO::CASE_NATURAL) {
             return $result;
+        }
+
         switch($this->_case)
         {
-            case \PDO::CASE_LOWER:
-                $case = CASE_LOWER;
-                break;
-            case \PDO::CASE_UPPER:
-                $case = CASE_UPPER;
-                break;
-            default:
-                throw new \PDOException('Unknown case attribute: '.$this->_case);
+        case \PDO::CASE_LOWER:
+            $case = CASE_LOWER;
+            break;
+        case \PDO::CASE_UPPER:
+            $case = CASE_UPPER;
+            break;
+        default:
+            throw new \PDOException('Unknown case attribute: '.$this->_case);
         }
-        if(is_array($result))
-        {
-            if(is_array($result[0])){
-                for($i = 0; $i < count($result);  $i++){
-                    $result[$i] = array_change_key_case($result[$i], $case);
+
+        return array_map(
+            function ($item) {
+                if (is_array($item)) {
+                    $item = array_change_key_case($item, $case);
                 }
-            }else{
-                $result = array_change_key_case($result, $case);
-            }
-        }
-        return $result;
+                return $item;
+            }, array_change_key_case($result, $case)
+        );
     }
 }
 ?>
