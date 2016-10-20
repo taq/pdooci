@@ -199,5 +199,30 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
         $id = self::$con->lastInsertId("people_sequence");
         $this->assertTrue(is_numeric($id));
     }
+
+    public function testCaseDefaultValue()
+    {
+        $case = self::$con->getAttribute(\PDO::ATTR_CASE);
+        $this->assertEquals(\PDO::CASE_NATURAL, $case);
+    }
+
+    /**
+     * Test setting case
+     * @param int $case
+     * @dataProvider caseProvider
+     */
+    public function testSettingCase($case)
+    {
+        self::$con->setAttribute(\PDO::ATTR_CASE, $case);
+        $this->assertEquals($case, self::$con->getAttribute(\PDO::ATTR_CASE));
+    }
+
+    public function caseProvider()
+    {
+        return array(
+            array(\PDO::CASE_LOWER),
+            array(\PDO::CASE_UPPER),
+        );
+    }
 }
 ?>

@@ -34,6 +34,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     private $_pos       = 0;
     private $_binds     = array();
     private $_bindsLob  = array();
+    private $_case      = null;
 
     /**
      * Constructor
@@ -51,6 +52,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
             $this->_statement = Statement::insertMarks($statement);
             $this->_stmt      = \oci_parse($this->_con, $this->_statement);
             $this->_fetch_sty = \PDO::FETCH_BOTH;
+            $this->_case      = $pdooci->getAttribute(\PDO::ATTR_CASE);
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -143,7 +145,6 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         $ok = false;
         set_error_handler(array($this->_pdooci,"errorHandler"));
         try {
-            $this->_pdooci->getAutoCommit();
             $auto = $this->_pdooci->getAutoCommit() ? \OCI_COMMIT_ON_SUCCESS : \OCI_NO_AUTO_COMMIT;
 
             if ($values && sizeof($values)>0) {
@@ -152,7 +153,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                     if (preg_match('/^\d+$/', $key)) {
                         $parm ++;
                     }
-                    $this->bindValue($parm, $values[$key]);
+                    $this->bindParam($parm, $values[$key]);
                     $this->_pdooci->setError();
                 }
             }
@@ -167,11 +168,15 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                         $ok = $bind['lob']->save($bind['value']);
                         if (!$ok) {
                             $error = $this->_pdooci->errorInfo();
-                            throw new \PDOException($error[2]);
+                            $e = new \PDOException($error[2], $error[1]);
+                            $e->errorInfo = $error;
+                            throw $e;
                         }
                     }
                 }
             }
+        } catch (\PDOException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
@@ -241,6 +246,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                 break;
             case \PDO::FETCH_ASSOC:
                 $rst = \oci_fetch_array($this->_stmt, \OCI_ASSOC + \OCI_RETURN_NULLS);
+                $rst = $this->_fixResultKeys($rst);
                 break;
             case \PDO::FETCH_NUM:
                 $rst = \oci_fetch_array($this->_stmt, \OCI_NUM + \OCI_RETURN_NULLS);
@@ -338,6 +344,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         } catch (\Exception $e) {
             throw new \PDOException($e->getMessage());
         }
+        $rst = $this->_fixResultKeys($rst);
         return $rst;
     }
 
@@ -603,6 +610,44 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     public function nextRowSet()
     {
         // TODO: insert some code here if needed
+    }
+
+    /**
+     * Fix the result keys
+     *
+     * If natural, there's no need to do something. Otherwise, change to lower
+     * or upper case
+     *
+     * @param mixed $result data result
+     *
+     * @return mixed $result with the keys fixed
+     */
+    private function _fixResultKeys($result)
+    {
+        if (!$this->_case || $this->_case === \PDO::CASE_NATURAL) {
+            return $result;
+        }
+
+        switch($this->_case)
+        {
+        case \PDO::CASE_LOWER:
+            $case = CASE_LOWER;
+            break;
+        case \PDO::CASE_UPPER:
+            $case = CASE_UPPER;
+            break;
+        default:
+            throw new \PDOException('Unknown case attribute: '.$this->_case);
+        }
+
+        return array_map(
+            function ($item) {
+                if (is_array($item)) {
+                    $item = array_change_key_case($item, $case);
+                }
+                return $item;
+            }, array_change_key_case($result, $case)
+        );
     }
 }
 ?>
