@@ -39,12 +39,12 @@ class PDO extends \PDO
      * @param string $data     the connection string
      * @param string $username user name
      * @param string $password password
-     * @param string $options  options to send to the connection
+     * @param array $options  options to send to the connection
      *
      * @return \PDO object
      * @throws \PDOException
      */
-    public function __construct($data, $username, $password, $options=null)
+    public function __construct($data, $username, $password, array $options=null)
     {
         if (!function_exists("\oci_parse")) {
             throw new \PDOException("No support for Oracle, please install the OCI driver");
@@ -58,7 +58,7 @@ class PDO extends \PDO
         $charset = $this->_getCharset($tokens);
 
         try {
-            if (!is_null($options) && array_key_exists(\PDO::ATTR_PERSISTENT, $options)) {
+            if (!empty($options) && array_key_exists(\PDO::ATTR_PERSISTENT, $options)) {
                 $this->_con = \oci_pconnect($username, $password, $data, $charset);
                 $this->setError();
             } else {
