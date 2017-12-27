@@ -106,7 +106,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
         try {
             $param = $this->_getBindVar($param);
             if ($type && $leng) {
-                $ok = \oci_bind_by_name($this->_stmt, $param, $value, $leng, $type);
+                $ok = \oci_bind_by_name($this->_stmt, $param, $value, $leng, $this->_pdoToOciType($type));
             } else {
                 $ok = \oci_bind_by_name($this->_stmt, $param, $value);
             }
@@ -648,6 +648,41 @@ class Statement extends \PDOStatement implements \IteratorAggregate
                 return $item;
             }, array_change_key_case($result, $case)
         );
+    }
+
+    /**
+     * Return the correct OCI type
+     *
+     * @param mixed $pdotype - PDO type
+     *
+     * @author John Yendt <@normcf>
+     *
+     * @return correc type
+     */
+    private function _pdoToOciType($pdotype)
+    {
+        $ocitype = SQLT_CHR;
+        $pdotype = $pdotype & ~ PDO::PARAM_INPUT_OUTPUT;
+
+        switch ($pdotype) {
+        case PDO::PARAM_STR:
+        case PDO::PARAM_NULL:
+            $ocitype = SQLT_CHR;
+            break;
+
+        case PDO::PARAM_INT:
+            $ocitype = SQLT_INT;
+            break;
+
+        case PDO::PARAM_BOOL:
+            $ocitype = SQLT_BOL;
+            break;
+
+        case PDO::PARAM_LOB:
+            $ociType = OCI_D_LOB;
+            break;
+        }
+        return $ocitype;
     }
 }
 ?>

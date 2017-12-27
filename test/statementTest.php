@@ -721,6 +721,24 @@ class StatementTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Bind named param with length
+     *
+     * @return null
+     */
+    public function testBindNamedParamWithLength()
+    {
+        $name = "eustaquio";
+        $this->_insertValue(array("name"=>"johndoe","email"=>"johndoe@gmail.com"));
+        $stmt = self::$con->prepare("select * from people where name=:name");
+        $stmt->bindParam(":name", $name, \PDO::PARAM_STR, 7);
+        $name = "johndoe";
+        $stmt->execute();
+        $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        $this->assertEquals($name, $data["NAME"]);
+    }
+
+    /**
      * Bind numeric value
      *
      * @return null
