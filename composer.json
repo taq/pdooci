@@ -4,7 +4,7 @@
     "description": "Replacement for the PHP PDO OCI class",
     "keywords": ["oracle","oci","pdo","pdo_oci"],
     "homepage": "http://github.com/taq/pdooci",
-    "license": "GPL",
+    "license": "GPL-2.0-or-later",
     "version": "1.0.8",
     "authors": [
         {
