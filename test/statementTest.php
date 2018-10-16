@@ -65,7 +65,7 @@ function useremail($name, $email)
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-class StatementTest extends PHPUnit_Framework_TestCase
+class StatementTest extends PHPUnit\Framework\TestCase
 {
     protected static $con = null;
 

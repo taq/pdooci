@@ -23,7 +23,7 @@ require_once "../vendor/autoload.php";
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-class ConnectionTest extends PHPUnit_Framework_TestCase
+class ConnectionTest extends PHPUnit\Framework\TestCase
 {
     protected static $con = null;
 

@@ -57,7 +57,7 @@ Yeah, the rest should work exactly the same as if you were using a PDO object. :
 
 ## Testing
 
-There is a test suite (using `PHPUnit`) on the `test` directory. If you want to
+There is a test suite (using `PHPUnit` with a version bigger than 6.x) on the `test` directory. If you want to
 test (you must test your code!), create a table called `people` with two
 columns:
 
