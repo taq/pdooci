@@ -358,7 +358,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     public function fetchColumn($colnum=0)
     {
         $rst = $this->fetch(\PDO::FETCH_NUM);
-        return $rst[$colnum];
+        return $rst === false ? false : $rst[$colnum];
     }
 
     /**
