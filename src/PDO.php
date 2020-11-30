@@ -69,8 +69,8 @@ class PDO extends \PDO
                 $error = oci_error();
                 throw new \Exception($error['code'].': '.$error['message']);
             }
-            if (array_key_exists(\PDO::ATTR_TIMEOUT, $options)) {
-                oci_set_call_timeout($this->_con, $options[\PDO::ATTR_TIMEOUT]);
+            if (!empty($options) && array_key_exists(\PDO::ATTR_TIMEOUT, $options)) {
+                \oci_set_call_timeout($this->_con, $options[\PDO::ATTR_TIMEOUT]);
             }
         } catch (\Exception $exception) {
             throw new \PDOException($exception->getMessage());
