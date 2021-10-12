@@ -23,18 +23,19 @@ namespace PDOOCI;
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GPLv2
  * @link     http://github.com/taq/pdooci
  */
-class Statement extends \PDOStatement implements \IteratorAggregate
+class Statement implements \IteratorAggregate
 {
-    private $_pdooci    = null;
-    private $_con       = null;
-    private $_statement = null;
-    private $_stmt      = null;
-    private $_fetch_sty = null;
-    private $_current   = null;
-    private $_pos       = 0;
-    private $_binds     = array();
-    private $_bindsLob  = array();
-    private $_case      = null;
+    private $_pdooci     = null;
+    private $_con        = null;
+    private $_statement  = null;
+    private $_stmt       = null;
+    private $_fetch_sty  = null;
+    private $_current    = null;
+    private $_pos        = 0;
+    private $_binds      = array();
+    private $_bindsLob   = array();
+    private $_case       = null;
+    public  $queryString = null;
 
     /**
      * Constructor
@@ -47,6 +48,7 @@ class Statement extends \PDOStatement implements \IteratorAggregate
     public function __construct($pdooci, $statement)
     {
         try {
+            $this->queryString = $statement;
             $this->_pdooci    = $pdooci;
             $this->_con       = $pdooci->getConnection();
             $this->_statement = Statement::insertMarks($statement);
