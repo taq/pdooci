@@ -32,8 +32,9 @@ class ConnectionTest extends PHPUnit\Framework\TestCase
      *
      * @return null
      */
-    public function setUp()
+    protected function setUp() : void
     {
+        parent::setUp();
         $user = getenv("PDOOCI_user");
         $pwd  = getenv("PDOOCI_pwd");
         $str  = getenv("PDOOCI_str");
@@ -102,6 +103,7 @@ class ConnectionTest extends PHPUnit\Framework\TestCase
         $user = "pdooci";
         $pwd  = "pdooci";
         $str  = "yaddayaddayadda";
+        $this->expectException(PDOException::class);
         $con  = new PDOOCI\PDO($str, $user, $pwd, array(\PDO::ATTR_PERSISTENT => true));
         $this->assertNull($con->getConnection());
     }
@@ -186,6 +188,7 @@ class ConnectionTest extends PHPUnit\Framework\TestCase
      */
     public function testLastIdWithoutSequence()
     {
+        $this->expectException(PDOException::class);
         $id = self::$con->lastInsertId();
     }
 

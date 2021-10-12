@@ -74,8 +74,9 @@ class StatementTest extends PHPUnit\Framework\TestCase
      *
      * @return null
      */
-    public function setUp() 
+    protected function setUp() : void
     {
+        parent::setUp();
         $user = getenv("PDOOCI_user");
         $pwd  = getenv("PDOOCI_pwd");
         $str  = getenv("PDOOCI_str");
@@ -863,6 +864,18 @@ END;
 
         $this->assertEquals("johndoe", $data[1]["NAME"]);
         $this->assertNull($data[1]["EMAIL"]);
+    }
+
+    /**
+     * Get statement query string
+     *
+     * @return query string
+     */
+    public function testQueryString()
+    {
+        $sql  = "select count(*) as count from people";
+        $stmt = self::$con->query($sql);
+        $this->assertEquals($sql, $stmt->queryString);
     }
 
     /****************************************************************************
