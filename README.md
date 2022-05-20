@@ -1,7 +1,9 @@
 # PDOCI
 
-Wrapping on PHP OCI functions to simulate a PDO object, using just pure PHP and
-the `oci_*` functions.
+| :warning: **WARNING** This software is [abandonware](https://en.wikipedia.org/wiki/Abandonware). As the creator and maintainer, I don't even use PHP or Oracle _for years_, so, I can't support it anymore. It should work ok for PHP untill version 7, but seems that with 8.1 there are some alerts. Feel free to fork it and keep it going. |
+| --- |
+
+Wrapping on PHP OCI functions to simulate a PDO object, using just pure PHP and the oci_* functions.
 
 Let's face it. Installing PHP, PDO, Oracle drivers and PDO OCI is not a pleasant
 task. Is more pleasant to insert bamboo sticks under your fingernails than make
